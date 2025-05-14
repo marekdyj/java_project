@@ -1,5 +1,6 @@
 package com.example.tetris_test_v1;
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class TetrisGame implements Serializable {
     private int[][] board;
@@ -18,7 +19,8 @@ public class TetrisGame implements Serializable {
         }
         score = 0;
         gameOver = false;
-        nextTetrimino= types[(int) (Math.random() * types.length)];
+        nextTetrimino = types[(int) (Math.random() * types.length)];
+        spawnNewTetrimino();
     }
 
     public void loadBoard(int[][] newBoard, Tetrimino tetrimino) {
@@ -67,18 +69,24 @@ public class TetrisGame implements Serializable {
             }
             if(checkOverlap(shape)){
                 gameOver = true;
+                // TODO: Add game over screen or some shit
+                System.out.println("game over");
             }
             else putDown();
         }
-        public void move(int dx, int dy) {
-                for(Position pos:shape){
-                    board[pos.x][pos.y]=0;
-                    pos.setX(pos.x+dx);
-                    pos.setY(pos.y+dy);
-                }
-                x=x+dx;
-                y=y+dy;
-                putDown();
+        private void move(int dx, int dy) {
+            if (checkCollision(dx, dy) || checkOverlap(shape)) {
+                return; // Cannot move
+            }
+            // Update positions
+            for(Position pos:shape){
+                board[pos.x][pos.y]=0;
+                pos.setX(pos.x+dx);
+                pos.setY(pos.y+dy);
+            }
+            x=x+dx;
+            y=y+dy;
+            putDown();
         }
         public void rotate() {
             if(type=='O') return;
@@ -233,6 +241,7 @@ public class TetrisGame implements Serializable {
                 pos.setX(pos.x + x);
                 pos.setY(pos.y + y);
             }
+            if(checkOutOfBounds(newShape)) return;
             if(checkOverlap(newShape)){
                 if(type=='i') positionType=(positionType+1)%2;
                 else positionType=(positionType-1)%4;
@@ -252,9 +261,19 @@ public class TetrisGame implements Serializable {
             return false;
         }
         public boolean checkCollision(int dx,int dy){
+            if(checkOutOfBounds(shape)) return true;
             for(Position pos:shape){
-                if(board[pos.x+dx][pos.y+dy]==1) return true;
                 if(pos.x+dx<0 || pos.x+dx>=board.length || pos.y+dy<0 || pos.y+dy>=board[0].length) return true;
+                if(board[pos.x+dx][pos.y+dy]==1) return true;
+
+            }
+            return false;
+        }
+        public boolean checkOutOfBounds(Position[] shape) {
+            for (Position pos : shape) {
+                if (pos.x < 0 || pos.x >= board.length || pos.y < 0 || pos.y >= board[0].length) {
+                    return true;
+                }
             }
             return false;
         }
@@ -275,6 +294,105 @@ public class TetrisGame implements Serializable {
             this.positionType = positionType;
             this.type = type;
         }
+
+        public Position[] getShape() {
+            return shape;
+        }
     }
     //TODO: implement tetrimino movement, check collision befor move, if bottom reached->lock
+
+    private void checkLines() {
+        int linesCleared = 0;
+        for (int i = 0; i < board.length; i++) {
+            boolean fullLine = true;
+            for (int j = 0; j < board[0].length; j++) {
+                if (board[i][j] == 0) {
+                    fullLine = false;
+                    break;
+                }
+            }
+            if (fullLine) {
+                removeLine(i);
+                linesCleared++;
+            }
+        }
+        updateScore(linesCleared);
+    }
+
+    private void removeLine(int line) {
+        for (int i = line; i > 0; i--) {
+            System.arraycopy(board[i-1], 0, board[i], 0, board[0].length);
+        }
+        Arrays.fill(board[0], 0);
+    }
+
+    private void updateScore(int lines) {
+        score += lines * 100;
+        // Add level progression logic here
+    }
+
+    private void spawnNewTetrimino() {
+        currentTetrimino = new Tetrimino(nextTetrimino, 2, 5);
+        nextTetrimino = types[(int) (Math.random() * types.length)];
+        if (currentTetrimino.checkOverlap(currentTetrimino.shape)) {
+            gameOver = true;
+        }
+    }
+
+    public int[][] getBoard() {
+        return board;
+    }
+
+    public Tetrimino getCurrentTetrimino() {
+        return currentTetrimino;
+    }
+
+    public char getNextTetrimino() {
+        return nextTetrimino;
+    }
+
+    public boolean isGameOver() {
+        return !gameOver;
+    }
+
+    public Tetrimino createPreviewPiece() {
+        return new Tetrimino(nextTetrimino, 2, 2);
+    }
+
+    public void moveLeft() {
+        currentTetrimino.move(0, -1);
+    }
+
+    public void moveRight() {
+        currentTetrimino.move(0, 1);
+    }
+
+    public void moveDown() {
+        currentTetrimino.move(1, 0);
+    }
+
+    public void rotate() {
+        currentTetrimino.rotate();
+    }
+
+    public void hardDrop() {
+        while (!currentTetrimino.checkCollision(1, 0)
+                || currentTetrimino.checkOutOfBounds(currentTetrimino.getShape())) {
+            currentTetrimino.move(1, 0);
+        }
+        currentTetrimino.lock();
+        checkLines();
+        spawnNewTetrimino();
+    }
+
+    public void update() {
+        if (!currentTetrimino.checkCollision(1, 0)
+                || currentTetrimino.checkOutOfBounds(currentTetrimino.getShape())) {
+            currentTetrimino.move(1, 0);
+        } else {
+            currentTetrimino.lock();
+            checkLines();
+            spawnNewTetrimino();
+        }
+    }
 }

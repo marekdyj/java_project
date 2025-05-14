@@ -180,26 +180,7 @@ public class TetrisLobbyGUI extends Application {
     private void showGameWindow() {
         Platform.runLater(() -> {
             Stage gameStage = new Stage();
-            gameStage.setTitle("Tetris Game");
-
-            VBox root = new VBox(10);
-            root.setPadding(new Insets(15));
-
-            Label gameLabel = new Label("Game in Progress");
-            gameLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-
-            // Przykładowa zawartość okna gry
-            TextArea gameArea = new TextArea();
-            gameArea.setEditable(false);
-            gameArea.setPrefHeight(300);
-            gameArea.setText("Game logic goes here...");
-
-            root.getChildren().addAll(gameLabel, gameArea);
-
-            Scene gameScene = new Scene(root, 400, 400);
-            gameStage.setScene(gameScene);
-            gameStage.show();
-
+            new GameWindow(gameStage);
             // Zamknij lobby po rozpoczęciu gry
             primaryStage.close();
         });
