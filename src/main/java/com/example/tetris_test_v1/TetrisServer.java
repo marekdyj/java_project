@@ -39,6 +39,8 @@ public class TetrisServer {
         private ObjectInputStream input;
         private ObjectOutputStream output;
         private GameRoom currentRoom;
+        private String nickname;
+        private boolean ready = false;
 
         public ClientHandler(Socket socket) {
             this.socket = socket;
@@ -50,13 +52,28 @@ public class TetrisServer {
                 output = new ObjectOutputStream(socket.getOutputStream());
                 input = new ObjectInputStream(socket.getInputStream());
 
-                send("Welcome to Tetris! Choose mode: 1 - Singleplayer, 2 - Multiplayer");
+                send("Enter your nickname:");
+                nickname = receive();
+
+                send("Welcome, " + nickname + "! Choose mode: 1 - Singleplayer, 2 - Multiplayer");
                 int choice = Integer.parseInt(receive());
 
                 if (choice == 1) {
                     send("Singleplayer not implemented yet.");
                 } else {
                     joinOrCreateRoom();
+                }
+
+                while (true) {
+                    String message = receive();
+                    if (message.equals("READY")) {
+                        if (currentRoom != null) {
+                            setReady(true);
+                            currentRoom.broadcastReadyStatus();
+                        } else {
+                            System.err.println("Error: currentRoom is null for player " + nickname);
+                        }
+                    }
                 }
 
             } catch (IOException | ClassNotFoundException e) {
@@ -69,6 +86,28 @@ public class TetrisServer {
                 }
             }
         }
+
+        public void setReady(boolean ready) {
+            this.ready = ready;
+        }
+
+        public boolean isReady() {
+            return ready;
+        }
+
+        public String getNickname() {
+            return nickname;
+        }
+
+        public void send(String message) throws IOException {
+            System.out.println("Sending to " + nickname + ": " + message); // Logowanie wiadomości
+            output.writeObject(message);
+        }
+
+        public String receive() throws IOException, ClassNotFoundException {
+            return (String) input.readObject();
+        }
+
 
         private void joinOrCreateRoom() throws IOException {
             synchronized (gameRooms) {
@@ -87,14 +126,6 @@ public class TetrisServer {
                 send("Created and joined new room.");
             }
         }
-
-        public void send(String message) throws IOException {
-            output.writeObject(message);
-        }
-
-        public String receive() throws IOException, ClassNotFoundException {
-            return (String) input.readObject();
-        }
     }
 
     // --- Pokój gry dla maksymalnie 4 graczy ---
@@ -103,7 +134,7 @@ public class TetrisServer {
 
         public synchronized void addPlayer(ClientHandler player) {
             players.add(player);
-            broadcast("Player joined. Current: " + players.size());
+            broadcast("Player " + player.getNickname() + " joined. Current: " + players.size());
 
             if (players.size() == MAX_ROOM_SIZE) {
                 startGame();
@@ -124,9 +155,25 @@ public class TetrisServer {
             }
         }
 
+        public void broadcastReadyStatus() {
+            long readyCount = players.stream().filter(ClientHandler::isReady).count();
+            broadcast("READY_STATUS:" + readyCount + "/" + players.size());
+
+            // Rozpocznij grę, jeśli wszyscy obecni gracze są gotowi
+            if (readyCount == players.size() && players.size() > 0) {
+                startGame();
+            }
+        }
+
         private void startGame() {
-            broadcast("Game started!");
-            // TODO: Rozpoczęcie gry właściwej
+            broadcast("START_GAME");
+
+            // Inicjalizacja stanu gry (przykład)
+            String initialGameState = "Game initialized with default settings.";
+            broadcast("GAME_STATE:" + initialGameState);
+
+            // TODO: Dodaj logikę gry właściwej
+            System.out.println("Game started for room with " + players.size() + " players.");
         }
     }
 }
