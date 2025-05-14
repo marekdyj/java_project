@@ -1,4 +1,4 @@
-package com.example.java_project;
+package com.example.tetris_test_v1;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
