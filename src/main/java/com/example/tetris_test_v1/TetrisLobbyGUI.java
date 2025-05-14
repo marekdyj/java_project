@@ -207,11 +207,11 @@ public class TetrisLobbyGUI extends Application {
 
     private void handleServerMessage(String msg) {
         System.out.println("Received message: " + msg);
-        if (msg.startsWith("START_GAME")) {
+        if (msg.contains("START_GAME")) {
             System.out.println("Starting game window...");
 
             showGameWindow();
-            if (msg.startsWith("LOBBY_PLAYERS:")) {
+            if (msg.contains("LOBBY_PLAYERS:")) {
                 Platform.runLater(() -> {
                     playerListBox.getChildren().clear();
                     String[] players = msg.substring(14).split(",");
@@ -220,17 +220,17 @@ public class TetrisLobbyGUI extends Application {
                         playerListBox.getChildren().add(new Label(player));
                     }
                 });
-            } else if (msg.startsWith("READY_STATUS:")) {
+            } else if (msg.contains("READY_STATUS:")) {
                 String[] parts = msg.substring(13).split("/");
                 readyPlayers = Integer.parseInt(parts[0]);
                 totalPlayers = Integer.parseInt(parts[1]);
                 Platform.runLater(() -> readyStatusLabel.setText("Ready: " + readyPlayers + "/" + totalPlayers));
 
-            } else if (msg.startsWith("GAME_STATE:")) {
+            } else if (msg.contains("GAME_STATE:")) {
                 String gameState = msg.substring(11);
                 // Update game state in the game window
                 System.out.println("Game state updated: " + gameState);
-            } else if (msg.startsWith("ERROR:")) {
+            } else if (msg.contains("ERROR:")) {
                 appendMessage("Error: " + msg.substring(6));
             } else {
                 appendMessage("Server: " + msg);
