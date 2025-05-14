@@ -1,5 +1,6 @@
 package com.example.tetris_test_v1;
 
+import com.example.tetris_test_v1.tetrimino.Tetrimino;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -89,7 +90,7 @@ public class GameWindow {
         }
 
         // Draw current piece
-        TetrisGame.Tetrimino current = game.getCurrentTetrimino();
+        Tetrimino current = game.getCurrentTetrimino();
         if (current != null) {
             for (Position pos : current.getShape()) {
                 drawBlock(gc, pos.y, pos.x, getColorForBlock(2));

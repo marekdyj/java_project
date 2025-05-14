@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
+// TODO: to jest do wywalenia czy nie ?
 public class TetrisClientConsole {
     public static void main(String[] args) {
         try (Socket socket = new Socket("localhost", 5000);

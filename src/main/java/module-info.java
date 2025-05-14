@@ -7,4 +7,6 @@ module com.example.tetris_test_v1 {
 
     opens com.example.tetris_test_v1 to javafx.fxml;
     exports com.example.tetris_test_v1;
+    exports com.example.tetris_test_v1.tetrimino;
+    opens com.example.tetris_test_v1.tetrimino to javafx.fxml;
 }
