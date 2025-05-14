@@ -1,6 +1,5 @@
 package com.example.tetris_test_v1;
 import java.io.Serializable;
-import java.lang.reflect.Array;
 
 public class TetrisGame implements Serializable {
     private int[][] board;
@@ -69,9 +68,9 @@ public class TetrisGame implements Serializable {
             if(checkOverlap(shape)){
                 gameOver = true;
             }
+            else putDown();
         }
         public void move(int dx, int dy) {
-            if(!checkCollision(dx, dy)) {
                 for(Position pos:shape){
                     board[pos.x][pos.y]=0;
                     pos.setX(pos.x+dx);
@@ -80,7 +79,6 @@ public class TetrisGame implements Serializable {
                 x=x+dx;
                 y=y+dy;
                 putDown();
-            }
         }
         public void rotate() {
             if(type=='O') return;
@@ -278,4 +276,5 @@ public class TetrisGame implements Serializable {
             this.type = type;
         }
     }
+    //TODO: implement tetrimino movement, check collision befor move, if bottom reached->lock
 }
