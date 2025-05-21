@@ -65,14 +65,25 @@ public class TetrisServer {
                 }
 
                 while (true) {
-                    String message = receive();
-                    if (message.equals("READY")) {
-                        if (currentRoom != null) {
-                            setReady(true);
-                            currentRoom.broadcastReadyStatus();
-                        } else {
-                            System.err.println("Error: currentRoom is null for player " + nickname);
+                    Object incoming = input.readObject();
+
+                    if (incoming instanceof String message) {
+                        System.out.println("Received message from " + nickname + ": " + message);
+
+                        if (message.equals("READY")) {
+                            if (currentRoom != null) {
+                                setReady(true);
+                                currentRoom.broadcastReadyStatus();
+                            } else {
+                                System.err.println("Error: currentRoom is null for player " + nickname);
+                            }
                         }
+                    } else if (incoming instanceof int[][] board) {
+                        System.out.println("Received board from " + nickname + ":");
+                        // if nickname, send board
+                        send(board);
+                    } else {
+                        System.out.println("Received unknown object from " + nickname);
                     }
                 }
 
@@ -99,7 +110,7 @@ public class TetrisServer {
             return nickname;
         }
 
-        public void send(String message) throws IOException {
+        public void send(Object message) throws IOException {
             System.out.println("Sending to " + nickname + ": " + message); // Logowanie wiadomości
             output.writeObject(message);
         }

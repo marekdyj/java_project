@@ -1,13 +1,20 @@
 package com.example.tetris_test_v1;
 
 import com.example.tetris_test_v1.tetrimino.Tetrimino;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 public class GameWindow {
     private static final int BLOCK_SIZE = 30;
@@ -18,9 +25,17 @@ public class GameWindow {
     private final TetrisGame game;
     private Canvas gameCanvas;
 
-    public GameWindow(Stage primaryStage) {
+    private TextArea serverMessages;
+    private Socket socket;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
+
+    public GameWindow(Stage primaryStage, Socket socket) throws IOException {
         this.stage = primaryStage;
         this.game = new TetrisGame();
+        this.socket = socket;
+        out = new ObjectOutputStream(socket.getOutputStream());
+        in = new ObjectInputStream(socket.getInputStream());
         initializeUI();
         setupGameLoop();
         setupControls();
@@ -81,6 +96,14 @@ public class GameWindow {
         gc.clearRect(0, 0, gameCanvas.getWidth(), gameCanvas.getHeight());
 
         int[][] board = game.getBoard();
+        try {
+            out.writeObject("BOARD SENT from");
+            out.writeObject(board);
+            out.flush();
+        } catch (IOException e) {
+            appendMessage("Failed to send board object.");
+        }
+
         for (int y = 0; y < BOARD_HEIGHT; y++) {
             for (int x = 0; x < BOARD_WIDTH; x++) {
                 if (board[y][x] != 0) {
@@ -114,5 +137,13 @@ public class GameWindow {
             case 2 -> Color.CYAN;  // Current piece
             default -> Color.WHITE; // Empty
         };
+    }
+
+    private void appendMessage(String msg) {
+        if (serverMessages == null) {
+            serverMessages = new TextArea(); // Inicjalizacja w razie potrzeby
+            serverMessages.setEditable(false);
+        }
+        Platform.runLater(() -> serverMessages.appendText(msg + "\n"));
     }
 }

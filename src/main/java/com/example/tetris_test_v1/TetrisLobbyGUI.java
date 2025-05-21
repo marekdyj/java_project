@@ -15,6 +15,7 @@ public class TetrisLobbyGUI extends Application {
 
     private ObjectInputStream in;
     private ObjectOutputStream out;
+    private Socket socket;
     private TextArea serverMessages;
     private Stage primaryStage;
     private VBox playerListBox;
@@ -98,7 +99,7 @@ public class TetrisLobbyGUI extends Application {
 
     private void connectToServer() {
         try {
-            Socket socket = new Socket("localhost", 5000);
+            socket = new Socket("localhost", 5000);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
 
@@ -180,7 +181,11 @@ public class TetrisLobbyGUI extends Application {
     private void showGameWindow() {
         Platform.runLater(() -> {
             Stage gameStage = new Stage();
-            new GameWindow(gameStage);
+            try {
+                new GameWindow(gameStage, socket);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             // Zamknij lobby po rozpoczęciu gry
             primaryStage.close();
         });
