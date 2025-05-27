@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * Podstawowy serwer TCP do gry Tetris.
@@ -78,10 +79,14 @@ public class TetrisServer {
                                 System.err.println("Error: currentRoom is null for player " + nickname);
                             }
                         }
-                    } else if (incoming instanceof int[][] board) {
-                        System.out.println("Received board from " + nickname + ":");
-                        // if nickname, send board
-                        send(board);
+                    } else if (incoming instanceof BoardUpdate boardObj) {
+                        System.out.println("Received board from " + nickname);
+                        if (currentRoom != null) {
+                            // Broadcast to other players in the room
+                            currentRoom.broadcastBoardUpdate(boardObj, this);
+                        } else {
+                            System.err.println("Error: currentRoom is null for player " + nickname);
+                        }
                     } else {
                         System.out.println("Received unknown object from " + nickname);
                     }
@@ -111,8 +116,12 @@ public class TetrisServer {
         }
 
         public void send(Object message) throws IOException {
-            System.out.println("Sending to " + nickname + ": " + message); // Logowanie wiadomości
+            // Logowanie wiadomości
+            if (message instanceof String) {
+                System.out.println("Sending String to " + nickname + ": " + message);
+            }
             output.writeObject(message);
+            output.flush();
         }
 
         public String receive() throws IOException, ClassNotFoundException {
@@ -177,6 +186,12 @@ public class TetrisServer {
         }
 
         private void startGame() {
+            // Utwórz liste graczy (oddzielone przecinkiem)
+            String playerList = players.stream()
+                    .map(ClientHandler::getNickname)
+                    .collect(Collectors.joining(","));
+            // Broadcastuj liste graczy
+            broadcast("PLAYER_LIST:" + playerList);
             broadcast("START_GAME");
 
             // Inicjalizacja stanu gry (przykład)
@@ -185,6 +200,20 @@ public class TetrisServer {
 
             // TODO: Dodaj logikę gry właściwej
             System.out.println("Game started for room with " + players.size() + " players.");
+        }
+
+        public void broadcastBoardUpdate(BoardUpdate boardUpdate, ClientHandler sender) {
+            for (ClientHandler player : players) {
+                if (player != sender) {
+                    try {
+                        player.send(boardUpdate);
+                        System.out.println("Sent board update to: " + player.getNickname());
+                    } catch (IOException e) {
+                        System.err.println("Failed to send board update to " + player.getNickname());
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
     }
 }

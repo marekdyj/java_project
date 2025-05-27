@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class TetrisLobbyGUI extends Application {
 
@@ -23,6 +24,10 @@ public class TetrisLobbyGUI extends Application {
     private Button readyButton;
     private int totalPlayers = 1;
     private int readyPlayers = 0;
+    private String nickname;
+    private String[] players;
+    private Thread listenerThread;
+    private GameWindow gameWindow;
 
     public static void main(String[] args) {
         launch(args);
@@ -46,6 +51,7 @@ public class TetrisLobbyGUI extends Application {
         submitButton.setOnAction(e -> {
             String nickname = nicknameField.getText().trim();
             if (!nickname.isEmpty()) {
+                this.nickname = nickname;
                 sendNickname(nickname);
             } else {
                 appendMessage("Nickname cannot be empty.");
@@ -103,11 +109,19 @@ public class TetrisLobbyGUI extends Application {
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
 
-            Thread listenerThread = new Thread(() -> {
+            listenerThread = new Thread(() -> {
                 try {
                     while (true) {
-                        String msg = (String) in.readObject();
-                        handleServerMessage(msg);
+                        Object obj = in.readObject();
+                        if (obj instanceof String message) {
+                            handleServerMessage(message);
+                        } else if (obj instanceof BoardUpdate) {
+                            if (gameWindow != null) {
+                                gameWindow.receiveBoardUpdate((BoardUpdate) obj);
+                            } else {
+                                System.out.println("Received board update from server, but game window is not open.");
+                            }
+                        }
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     appendMessage("Connection closed or error.");
@@ -182,7 +196,8 @@ public class TetrisLobbyGUI extends Application {
         Platform.runLater(() -> {
             Stage gameStage = new Stage();
             try {
-                new GameWindow(gameStage, socket);
+                System.out.println(Arrays.toString(players));
+                gameWindow = new GameWindow(gameStage, in, out, players, nickname);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -193,9 +208,10 @@ public class TetrisLobbyGUI extends Application {
 
     private void handleServerMessage(String msg) {
         System.out.println("Received message: " + msg);
-        if (msg.contains("START_GAME")) {
+        if (msg.contains("PLAYER_LIST:")) {
+            this.players = msg.substring(19).split(",");
+        } else if (msg.contains("START_GAME")) {
             System.out.println("Starting game window...");
-
             showGameWindow();
             if (msg.contains("LOBBY_PLAYERS:")) {
                 Platform.runLater(() -> {
