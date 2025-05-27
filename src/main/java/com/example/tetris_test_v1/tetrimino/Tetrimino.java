@@ -1,7 +1,6 @@
 package com.example.tetris_test_v1.tetrimino;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 import com.example.tetris_test_v1.Position;
 
@@ -9,7 +8,7 @@ import com.example.tetris_test_v1.Position;
 public abstract class Tetrimino implements Serializable {
     protected Position[] shape;
     protected int x, y;
-    protected int positionType = 0;
+    protected int positionType = 1;
     protected char type;
     protected int[][] board;
 
@@ -50,7 +49,8 @@ public abstract class Tetrimino implements Serializable {
 
     public void rotate() {
         Position[] newShape = rotateShape();
-        for(Position pos : newShape){
+
+        for (Position pos : newShape) {
             pos.setX(pos.x + x);
             pos.setY(pos.y + y);
         }
@@ -66,6 +66,8 @@ public abstract class Tetrimino implements Serializable {
             shape[i].setY(newShape[i].y);
         }
         putDown();
+
+
     }
 
     public boolean checkOverlap(Position[] _shape) {
@@ -91,6 +93,8 @@ public abstract class Tetrimino implements Serializable {
         }
         return false;
     }
+
+
     public void lock() {
         for(Position pos:shape){
             board[pos.x][pos.y]=1;
