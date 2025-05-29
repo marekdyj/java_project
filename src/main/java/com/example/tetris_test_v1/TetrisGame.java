@@ -5,9 +5,13 @@ import com.example.tetris_test_v1.tetrimino.TetriminoType;
 import java.io.Serializable;
 import java.util.Arrays;
 
+import static java.lang.Math.max;
+
 public class TetrisGame implements Serializable {
     private int[][] board;
     private int score;
+    private int level=1;
+    private int linesSinceLastLevelup =0;
     private boolean gameOver;
     private Tetrimino currentTetrimino;
     private TetriminoType nextTetrimino;
@@ -48,6 +52,20 @@ public class TetrisGame implements Serializable {
                 linesCleared++;
             }
         }
+        linesSinceLastLevelup += linesCleared;
+        if(level<=10 && linesSinceLastLevelup >= level*10+10) {
+            linesSinceLastLevelup -= level*10+10;
+            level++;
+        }
+        else if(level>10&&level<20 && linesSinceLastLevelup >= max(level*10-50,100)) {
+            linesSinceLastLevelup -= level*10-50;
+            level++;
+        }
+        else if(level>=20&&linesSinceLastLevelup>=200){
+            linesSinceLastLevelup -= 200;
+            level++;
+        }
+
         updateScore(linesCleared);
     }
 
@@ -59,8 +77,7 @@ public class TetrisGame implements Serializable {
     }
 
     private void updateScore(int lines) {
-        score += lines*lines * 100;
-        // TODO: Add level progression logic
+        score += level*lines*lines * 100;
     }
 
     private void spawnNewTetrimino() {
@@ -134,5 +151,8 @@ public class TetrisGame implements Serializable {
         lastUsedTetriminos[lastUsedIndex] = next;
         lastUsedIndex++;
         return next;
+    }
+    public int getLevel() {
+        return level;
     }
 }
