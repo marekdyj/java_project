@@ -10,9 +10,8 @@ public class Tetrimino_I extends Tetrimino {
     Position[] newShape = new Position[4];
     @Override
     protected Position[] initializeShape() {
-        return new Position[]{
-            new Position(-2,0), new Position(0,0),
-            new Position(-1,0), new Position(1,0)
+        return new Position[]{new Position(0,-2),new Position(0,1),
+                new Position(0,0),new Position(0,-1)
         };
     }
 

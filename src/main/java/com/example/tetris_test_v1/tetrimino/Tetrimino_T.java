@@ -12,7 +12,7 @@ public class Tetrimino_T extends Tetrimino {
     protected Position[] initializeShape() {
         return new Position[]{
             new Position(-1,0), new Position(0,0),
-            new Position(1,0), new Position(0,1)
+            new Position(0,-1), new Position(0,1)
         };
     }
     @Override

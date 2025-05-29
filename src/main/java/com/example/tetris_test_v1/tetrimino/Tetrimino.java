@@ -8,7 +8,7 @@ import com.example.tetris_test_v1.Position;
 public abstract class Tetrimino implements Serializable {
     protected Position[] shape;
     protected int x, y;
-    protected int positionType = 1;
+    protected int positionType = 0;
     protected char type;
     protected int[][] board;
 
@@ -54,10 +54,8 @@ public abstract class Tetrimino implements Serializable {
             pos.setX(pos.x + x);
             pos.setY(pos.y + y);
         }
-        if(checkOutOfBounds(newShape)) return;
-        if(checkOverlap(newShape)){
-            if(type=='I') positionType=(positionType+1)%2;
-            else positionType=(positionType-1)%4;
+        if(checkOutOfBounds(newShape)||checkOverlap(newShape)){
+            positionType=(positionType-1)%4;
             return;
         }
         for(int i=0;i<shape.length;i++){
