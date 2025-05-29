@@ -11,6 +11,8 @@ public class TetrisGame implements Serializable {
     private boolean gameOver;
     private Tetrimino currentTetrimino;
     private TetriminoType nextTetrimino;
+    private TetriminoType[] lastUsedTetriminos = new TetriminoType[7];
+    private int lastUsedIndex = 0;
 
     public TetrisGame() {
         board = new int[22][10]; // 20 rows, 10 columns
@@ -21,7 +23,7 @@ public class TetrisGame implements Serializable {
         }
         score = 0;
         gameOver = false;
-        nextTetrimino = TetriminoType.getRandom();
+        nextTetrimino = getNextTetrimino();
         spawnNewTetrimino();
     }
 
@@ -57,13 +59,13 @@ public class TetrisGame implements Serializable {
     }
 
     private void updateScore(int lines) {
-        score += lines * 100;
+        score += lines*lines * 100;
         // TODO: Add level progression logic
     }
 
     private void spawnNewTetrimino() {
         currentTetrimino = nextTetrimino.createInstance(2, 5, board);
-        nextTetrimino = TetriminoType.getRandom();
+        nextTetrimino = getNextTetrimino();
         if (currentTetrimino.checkOverlap(currentTetrimino.getShape())) {
             gameOver = true;
         }
@@ -116,5 +118,21 @@ public class TetrisGame implements Serializable {
             checkLines();
             spawnNewTetrimino();
         }
+    }
+
+    private TetriminoType getNextTetrimino() {
+        if( lastUsedIndex >= lastUsedTetriminos.length) {
+            for(int i=0;i<lastUsedTetriminos.length;i++){
+                lastUsedTetriminos[i]=null;
+            }
+            lastUsedIndex = 0;
+        }
+        TetriminoType next= TetriminoType.getRandom();
+        while(Arrays.asList(lastUsedTetriminos).contains(next)) {
+            next = TetriminoType.getRandom();
+        }
+        lastUsedTetriminos[lastUsedIndex] = next;
+        lastUsedIndex++;
+        return next;
     }
 }
