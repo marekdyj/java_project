@@ -152,6 +152,7 @@ public class GameWindow {
             int[][] currentBoard = game.getBoard();
             System.out.println("Sending board update: " + java.util.Arrays.deepToString(currentBoard)); // Debug
             out.writeObject(new BoardUpdate(nickname, currentBoard));
+            out.reset();
             out.flush();
         } catch (IOException e) {
             appendMessage("Failed to send board update");
