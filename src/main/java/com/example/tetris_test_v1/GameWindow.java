@@ -151,7 +151,7 @@ public class GameWindow {
         try {
             int[][] currentBoard = game.getBoard();
             System.out.println("Sending board update: " + java.util.Arrays.deepToString(currentBoard)); // Debug
-            out.writeObject(new BoardUpdate(nickname, currentBoard));
+            out.writeObject(new BoardUpdate(nickname, currentBoard, game.getLevel(),game.getScore()));
             out.reset();
             out.flush();
         } catch (IOException e) {
@@ -162,6 +162,8 @@ public class GameWindow {
     public void receiveBoardUpdate(BoardUpdate update) {
         String targetNickname = update.nickname();
         int[][] board = update.board();
+        int score= update.score();
+        int level= update.level();
 
         Platform.runLater(() -> {
             System.out.println("Received update for: " + targetNickname); // Debug

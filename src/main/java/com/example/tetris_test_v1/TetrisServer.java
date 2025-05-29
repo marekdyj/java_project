@@ -67,7 +67,6 @@ public class TetrisServer {
 
                 while (true) {
                     Object incoming = input.readObject();
-
                     if (incoming instanceof String message) {
                         System.out.println("Received message from " + nickname + ": " + message);
 

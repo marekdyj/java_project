@@ -155,4 +155,7 @@ public class TetrisGame implements Serializable {
     public int getLevel() {
         return level;
     }
+    public int getScore() {
+        return score;
+    }
 }
