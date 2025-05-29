@@ -167,7 +167,7 @@ public class GameWindow {
 
         Platform.runLater(() -> {
             System.out.println("Received update for: " + targetNickname); // Debug
-            System.out.println("Board content: " + java.util.Arrays.deepToString(board)); // Debug
+            System.out.println("Level:"+level+", Score: "+score+", Board content: " + java.util.Arrays.deepToString(board)); // Debug
 
             Canvas targetCanvas = playerCanvases.get(targetNickname);
             if (targetCanvas != null) {
