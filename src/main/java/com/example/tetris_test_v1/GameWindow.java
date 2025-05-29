@@ -87,7 +87,7 @@ public class GameWindow {
                     int level=game.getLevel()-1;
                     int speedup=0;
                     if(level<=9) speedup=level*77;
-                    else speedup=693+level*3;
+                    else speedup=693+(level-9)*3;
                     if(speedup>720)speedup=720; // Maksymalna prędkość
                     Thread.sleep(800-speedup); // Sleep for 1 second
                 } catch (InterruptedException e) {
