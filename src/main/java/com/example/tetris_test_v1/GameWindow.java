@@ -93,8 +93,6 @@ public class GameWindow {
     private void setupGameLoop() {
         new Thread(() -> {
             while (true) {
-                updateGame();
-                renderBoard();
                 try {
                     // Handle flashing animation
                     if (game.isClearingInProgress()) {
@@ -104,7 +102,12 @@ public class GameWindow {
                         }
                         game.finalizeLineClear();
                     }
-
+                } catch (InterruptedException e) {
+                    break;
+                }
+                updateGame();
+                renderBoard();
+                try {
                     int level=game.getLevel()-1;
                     int speedup=0;
                     if(level<=9) speedup=level*77;
@@ -167,11 +170,13 @@ public class GameWindow {
                 }
             }
 
-            // Draw current piece
-            Tetrimino current = game.getCurrentTetrimino();
-            if (current != null) {
-                for (Position pos : current.getShape()) {
-                    drawBlock(gc, pos.y, pos.x, 2);
+            if (!game.isClearingInProgress()) {
+                // Draw current piece
+                Tetrimino current = game.getCurrentTetrimino();
+                if (current != null) {
+                    for (Position pos : current.getShape()) {
+                        drawBlock(gc, pos.y, pos.x, 2);
+                    }
                 }
             }
         }
@@ -206,7 +211,7 @@ public class GameWindow {
             System.out.println("Level:"+level+", Score: "+score+", Board content: " + update); // Debug
 
             Canvas targetCanvas = playerCanvases.get(targetNickname);
-            if (targetCanvas != null) {
+            if (targetCanvas != null && !game.isClearingInProgress()) {
                 drawRemoteBoard(targetCanvas, board);
             } else {
                 System.out.println("Canvas is null for: " + targetNickname);

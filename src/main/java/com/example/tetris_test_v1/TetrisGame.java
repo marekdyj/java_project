@@ -20,8 +20,6 @@ public class TetrisGame implements Serializable {
 
     private boolean[] linesToClear = new boolean[22];
     private boolean clearingInProgress = false;
-    private static final long CLEAR_DELAY_MS = 100;
-    private static final int FLASH_COUNT = 6;
 
     public TetrisGame() {
         board = new int[22][10]; // 20 rows, 10 columns
@@ -42,16 +40,9 @@ public class TetrisGame implements Serializable {
     }
     //TODO: implement tetrimino movement, check collision befor move, if bottom reached->lock
 
-    public boolean isLineBeingCleared() {
-        for (boolean b : linesToClear) {
-            if (b) return true;
-        }
-        return false;
-    }
-
     private void checkLines() {
+        // Utwórz tablice lini do usunięcia (dla ułatwienia)
         Arrays.fill(linesToClear, false);
-
         for (int i = 0; i < board.length; i++) {
             boolean fullLine = true;
             for (int j = 0; j < board[0].length; j++) {
@@ -65,26 +56,25 @@ public class TetrisGame implements Serializable {
             }
         }
 
-        if (isLineBeingCleared()) {
-            clearingInProgress = true;
+        // Jeżeli jest jakaś linia do usunięcia, to zacznij usuwac (clearingInProgress)
+        for (boolean b : linesToClear) {
+            if (b) {
+                clearingInProgress = true;
+                break;
+            }
         }
     }
 
     public void finalizeLineClear() {
         for (int i = board.length - 1; i >= 0; i--) {
             if (linesToClear[i]) {
-                for (int k = i; k > 0; k--) {
-                    System.arraycopy(board[k - 1], 0, board[k], 0, board[0].length);
-                }
-                Arrays.fill(board[0], 0);
+                removeLine(i);
             }
         }
 
         int linesCleared = 0;
-        if (isLineBeingCleared()) {
-            for (boolean b : linesToClear) {
-                if (b) linesCleared++;
-            }
+        for (boolean b : linesToClear) {
+            if (b) linesCleared++;
         }
         linesSinceLastLevelup += linesCleared;
 
@@ -100,8 +90,6 @@ public class TetrisGame implements Serializable {
         }
 
         updateScore(linesCleared);
-        Arrays.fill(linesToClear, false);
-        clearingInProgress = false;
     }
 
 
@@ -110,6 +98,8 @@ public class TetrisGame implements Serializable {
             System.arraycopy(board[i-1], 0, board[i], 0, board[0].length);
         }
         Arrays.fill(board[0], 0);
+        Arrays.fill(linesToClear, false);
+        clearingInProgress = false;
     }
 
     private void updateScore(int lines) {
@@ -188,18 +178,12 @@ public class TetrisGame implements Serializable {
         lastUsedIndex++;
         return next;
     }
-    public boolean[] getLinesToClear() {
-        return linesToClear;
-    }
-
     public boolean isLineMarkedForClear(int line) {
         return linesToClear[line];
     }
-
     public boolean isClearingInProgress() {
         return clearingInProgress;
     }
-
     public int getLevel() {
         return level;
     }
