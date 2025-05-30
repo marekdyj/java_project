@@ -32,8 +32,8 @@ public class GameWindow {
     private String[] players;
 
     private TextArea serverMessages;
-    private ObjectInputStream in;
-    private ObjectOutputStream out;
+    private final ObjectInputStream in;
+    private final ObjectOutputStream out;
 
     public GameWindow(Stage primaryStage, ObjectInputStream in, ObjectOutputStream out, String[] players, String nickname) throws IOException {
         this.stage = primaryStage;
@@ -148,14 +148,17 @@ public class GameWindow {
     }
 
     private void sendBoardUpdate() {
-        try {
-            int[][] currentBoard = game.getBoard();
-            System.out.println("Sending board update: " + java.util.Arrays.deepToString(currentBoard)); // Debug
-            out.writeObject(new BoardUpdate(nickname, currentBoard, game.getLevel(),game.getScore()));
-            out.reset();
-            out.flush();
-        } catch (IOException e) {
-            appendMessage("Failed to send board update");
+        synchronized(out) {
+            try {
+                int[][] currentBoard = game.getBoard();
+                BoardUpdate update = new BoardUpdate(nickname, currentBoard, game.getLevel(),game.getScore());
+                System.out.println("Sending board update: " + update); // Debug
+                out.writeObject(update);
+                out.reset();
+                out.flush();
+            } catch (IOException e) {
+                appendMessage("Failed to send board update");
+            }
         }
     }
 
@@ -167,7 +170,7 @@ public class GameWindow {
 
         Platform.runLater(() -> {
             System.out.println("Received update for: " + targetNickname); // Debug
-            System.out.println("Level:"+level+", Score: "+score+", Board content: " + java.util.Arrays.deepToString(board)); // Debug
+            System.out.println("Level:"+level+", Score: "+score+", Board content: " + update); // Debug
 
             Canvas targetCanvas = playerCanvases.get(targetNickname);
             if (targetCanvas != null) {

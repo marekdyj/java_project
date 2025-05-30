@@ -115,12 +115,15 @@ public class TetrisServer {
         }
 
         public void send(Object message) throws IOException {
-            // Logowanie wiadomości
-            if (message instanceof String) {
-                System.out.println("Sending String to " + nickname + ": " + message);
+            synchronized (this) {
+                // Logowanie wiadomości
+                if (message instanceof String) {
+                    System.out.println("Sending String to " + nickname + ": " + message);
+                }
+                output.writeObject(message);
+                output.reset();
+                output.flush();
             }
-            output.writeObject(message);
-            output.flush();
         }
 
         public String receive() throws IOException, ClassNotFoundException {
@@ -206,7 +209,7 @@ public class TetrisServer {
                 if (player != sender) {
                     try {
                         player.send(boardUpdate);
-                        System.out.println("Sent board update to: " + player.getNickname());
+                        System.out.println("Sender: " + boardUpdate.nickname() + "; Sent board update to: " + player.getNickname());
                     } catch (IOException e) {
                         System.err.println("Failed to send board update to " + player.getNickname());
                         e.printStackTrace();
