@@ -14,7 +14,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -232,10 +231,11 @@ public class GameWindow {
     }
 
     private int[] getBlockState(int value) {
+        int level = game.getLevel()-1;
         return switch (value) {
-            case 1 -> new int[]{0, 0}; // Locked blocks
-            case 2 -> new int[]{1, 0};  // Current piece
-            default -> new int[]{0, 0}; // Empty
+            case 1 -> new int[]{0, level};  // Locked blocks
+            case 2 -> new int[]{1, level};  // Current piece
+            default -> new int[]{0, level}; // Empty
         };
     }
 
