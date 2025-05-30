@@ -160,7 +160,7 @@ public class TetrisLobbyGUI extends Application {
         playerListBox = new VBox(5);
         playerListBox.getChildren().add(new Label("Waiting for players..."));
 
-        readyStatusLabel = new Label("Ready: 0/1");
+        readyStatusLabel = new Label("Ready: " + readyPlayers +"/" + totalPlayers);
         readyButton = new Button("Ready");
         readyButton.setOnAction(e -> {
             try {
@@ -210,6 +210,11 @@ public class TetrisLobbyGUI extends Application {
         System.out.println("Received message: " + msg);
         if (msg.contains("PLAYER_LIST:")) {
             this.players = msg.substring(19).split(",");
+        } else if (msg.contains("READY_STATUS:")) {
+            String[] parts = msg.substring(20).split("/");
+            readyPlayers = Integer.parseInt(parts[0]);
+            totalPlayers = Integer.parseInt(parts[1]);
+            Platform.runLater(() -> readyStatusLabel.setText("Ready: " + readyPlayers + "/" + totalPlayers));
         } else if (msg.contains("START_GAME")) {
             System.out.println("Starting game window...");
             showGameWindow();
@@ -222,12 +227,6 @@ public class TetrisLobbyGUI extends Application {
                         playerListBox.getChildren().add(new Label(player));
                     }
                 });
-            } else if (msg.contains("READY_STATUS:")) {
-                String[] parts = msg.substring(13).split("/");
-                readyPlayers = Integer.parseInt(parts[0]);
-                totalPlayers = Integer.parseInt(parts[1]);
-                Platform.runLater(() -> readyStatusLabel.setText("Ready: " + readyPlayers + "/" + totalPlayers));
-
             } else if (msg.contains("GAME_STATE:")) {
                 String gameState = msg.substring(11);
                 // Update game state in the game window

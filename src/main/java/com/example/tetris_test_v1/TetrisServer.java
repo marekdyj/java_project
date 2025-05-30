@@ -157,6 +157,7 @@ public class TetrisServer {
         public synchronized void addPlayer(ClientHandler player) {
             players.add(player);
             broadcast("Player " + player.getNickname() + " joined. Current: " + players.size());
+            broadcastReadyStatus();
 
             if (players.size() == MAX_ROOM_SIZE) {
                 startGame();
