@@ -14,6 +14,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -95,6 +96,15 @@ public class GameWindow {
                 updateGame();
                 renderBoard();
                 try {
+                    // Handle flashing animation
+                    if (game.isClearingInProgress()) {
+                        for (int i = 0; i < 6; i++) {
+                            renderBoard(i % 2 == 0); // Flash ON and OFF
+                            Thread.sleep(50);
+                        }
+                        game.finalizeLineClear();
+                    }
+
                     int level=game.getLevel()-1;
                     int speedup=0;
                     if(level<=9) speedup=level*77;
@@ -111,7 +121,7 @@ public class GameWindow {
     private void setupControls() {
         stage.getScene().setOnKeyPressed(event -> {
             KeyCode key = event.getCode();
-            if (game.getCurrentTetrimino() != null && game.isGameOver()) {
+            if (game.getCurrentTetrimino() != null && !game.isClearingInProgress() && game.isGameOver()) {
                 switch (key) {
                     case LEFT: game.moveLeft(); break;
                     case RIGHT: game.moveRight(); break;
@@ -125,12 +135,16 @@ public class GameWindow {
     }
 
     private void updateGame() {
-        if (game.isGameOver()) {
+        if (!game.isClearingInProgress() && game.isGameOver()) {
             game.update();
         }
     }
 
-    private void renderBoard() {
+    // default flash = false
+    public void renderBoard() {
+        renderBoard(false);
+    }
+    private void renderBoard(boolean flash) {
         Canvas gameCanvas = playerCanvases.get(nickname);
         if (gameCanvas != null) {
             GraphicsContext gc = gameCanvas.getGraphicsContext2D();
@@ -140,7 +154,15 @@ public class GameWindow {
             for (int y = 0; y < BOARD_HEIGHT; y++) {
                 for (int x = 0; x < BOARD_WIDTH; x++) {
                     if (board[y][x] != 0) {
-                        drawBlock(gc, x, y, board[y][x]);
+                        if (game.isClearingInProgress() && game.isLineMarkedForClear(y)) {
+                            if (flash) {
+                                drawBlock(gc, x, y, board[y][x], true);
+                            } else {
+                                drawBlock(gc, x, y, board[y][x]);
+                            }
+                        } else {
+                            drawBlock(gc, x, y, board[y][x]);
+                        }
                     }
                 }
             }
@@ -216,7 +238,16 @@ public class GameWindow {
         }
     }
 
+    // default flash = false
     private void drawBlock(GraphicsContext gc, int x, int y, int blockState) {
+        drawBlock(gc, x, y, blockState, false);
+    }
+    private void drawBlock(GraphicsContext gc, int x, int y, int blockState, boolean flashingEffect) {
+        if (flashingEffect) {
+            gc.setFill(Color.WHITE);
+            gc.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+            return;
+        }
         try {
             int[] spriteCoords = getBlockState(blockState);
             WritableImage blockImage = getBlockSprite(spriteCoords[0], spriteCoords[1]);
