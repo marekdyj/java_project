@@ -164,7 +164,9 @@ public class TetrisGame implements Serializable {
         }
         currentTetrimino.lock();
         checkLines();
-        spawnNewTetrimino();
+        if ((!clearingInProgress)) {
+            spawnNewTetrimino();
+        }
     }
 
     public void update() {
@@ -174,7 +176,9 @@ public class TetrisGame implements Serializable {
         } else {
             currentTetrimino.lock();
             checkLines();
-            spawnNewTetrimino();
+            if ((!clearingInProgress)) {
+                spawnNewTetrimino();
+            }
         }
     }
 
