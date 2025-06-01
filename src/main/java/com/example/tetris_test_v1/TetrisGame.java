@@ -66,16 +66,31 @@ public class TetrisGame implements Serializable {
     }
 
     public void finalizeLineClear() {
+        // Zlicz ilość linijek do usunięcia
+        int linesCleared = 0;
         for (int i = board.length - 1; i >= 0; i--) {
             if (linesToClear[i]) {
-                removeLine(i);
+                linesCleared++;
             }
         }
 
-        int linesCleared = 0;
-        for (boolean b : linesToClear) {
-            if (b) linesCleared++;
+        if (linesCleared > 0) {
+            // Utwórz nową tablicę bez usuniętych linii
+            int[][] newBoard = new int[board.length][board[0].length];
+            int newRow = board.length - 1;
+
+            // Usuń linie
+            for (int i = board.length - 1; i >= 0; i--) {
+                if (!linesToClear[i]) {
+                    System.arraycopy(board[i], 0, newBoard[newRow], 0, board[0].length);
+                    newRow--;
+                }
+            }
+
+            // Update the board
+            board = newBoard;
         }
+
         linesSinceLastLevelup += linesCleared;
 
         if (level <= 10 && linesSinceLastLevelup >= level * 10 + 10) {
@@ -90,6 +105,8 @@ public class TetrisGame implements Serializable {
         }
 
         updateScore(linesCleared);
+        Arrays.fill(linesToClear, false);
+        clearingInProgress = false;
     }
 
 
@@ -98,8 +115,6 @@ public class TetrisGame implements Serializable {
             System.arraycopy(board[i-1], 0, board[i], 0, board[0].length);
         }
         Arrays.fill(board[0], 0);
-        Arrays.fill(linesToClear, false);
-        clearingInProgress = false;
     }
 
     private void updateScore(int lines) {
