@@ -6,6 +6,9 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import java.io.*;
@@ -38,16 +41,28 @@ public class TetrisLobbyGUI extends Application {
         this.primaryStage = primaryStage;
         primaryStage.setTitle("Tetris Lobby");
         connectToServer();
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(15));
+
+        VBox root = new VBox(14);
+        root.setPadding(new Insets(22, 22, 22, 22));
+        root.setSpacing(12);
+        // Light background and subtle border
+        root.setBackground(new Background(new BackgroundFill(Color.web("#f8fafc"), new CornerRadii(8), Insets.EMPTY)));
+        root.setBorder(new Border(new BorderStroke(Color.web("#c5ccd7"), BorderStrokeStyle.SOLID, new CornerRadii(8), new BorderWidths(2))));
 
         Label titleLabel = new Label("Enter your nickname:");
-        titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        titleLabel.setFont(Font.font("System", FontWeight.BOLD, 15));
+        titleLabel.setTextFill(Color.web("#33415c"));
 
         TextField nicknameField = new TextField();
         nicknameField.setPromptText("Nickname");
+        nicknameField.setFont(Font.font("System", FontWeight.NORMAL, 13));
+        nicknameField.setMaxWidth(220);
 
         Button submitButton = new Button("Submit");
+        submitButton.setFont(Font.font("System", FontWeight.BOLD, 13));
+        submitButton.setBackground(new Background(new BackgroundFill(Color.web("#e3e9f6"), new CornerRadii(6), Insets.EMPTY)));
+        submitButton.setTextFill(Color.web("#33415c"));
+
         submitButton.setOnAction(e -> {
             String nickname = nicknameField.getText().trim();
             if (!nickname.isEmpty()) {
@@ -60,7 +75,7 @@ public class TetrisLobbyGUI extends Application {
 
         root.getChildren().addAll(titleLabel, nicknameField, submitButton);
 
-        Scene scene = new Scene(root, 400, 200);
+        Scene scene = new Scene(root, 400, 180);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -76,24 +91,38 @@ public class TetrisLobbyGUI extends Application {
     }
 
     private void showMainMenu() {
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(15));
+        VBox root = new VBox(12);
+        root.setPadding(new Insets(22, 22, 22, 22));
+        root.setSpacing(10);
+        // Light background and subtle border
+        root.setBackground(new Background(new BackgroundFill(Color.web("#f4f6fa"), new CornerRadii(8), Insets.EMPTY)));
+        root.setBorder(new Border(new BorderStroke(Color.web("#c5ccd7"), BorderStrokeStyle.SOLID, new CornerRadii(8), new BorderWidths(2))));
 
         Label titleLabel = new Label("Welcome to Tetris Lobby");
-        titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        titleLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+        titleLabel.setTextFill(Color.web("#33415c"));
 
         serverMessages = new TextArea();
         serverMessages.setEditable(false);
-        serverMessages.setPrefHeight(200);
+        serverMessages.setPrefHeight(120);
+        serverMessages.setStyle("-fx-control-inner-background: #e7ecf3; -fx-text-fill: #33415c; -fx-font-size: 12px;");
 
         Button singleplayerBtn = new Button("Singleplayer");
         Button multiplayerBtn = new Button("Multiplayer");
 
-        HBox buttonBox = new HBox(10, singleplayerBtn, multiplayerBtn);
+        singleplayerBtn.setFont(Font.font("System", FontWeight.BOLD, 12));
+        singleplayerBtn.setBackground(new Background(new BackgroundFill(Color.web("#e3e9f6"), new CornerRadii(6), Insets.EMPTY)));
+        singleplayerBtn.setTextFill(Color.web("#33415c"));
+        multiplayerBtn.setFont(Font.font("System", FontWeight.BOLD, 12));
+        multiplayerBtn.setBackground(new Background(new BackgroundFill(Color.web("#d7f8f0"), new CornerRadii(6), Insets.EMPTY)));
+        multiplayerBtn.setTextFill(Color.web("#246b5d"));
+
+        HBox buttonBox = new HBox(14, singleplayerBtn, multiplayerBtn);
+        buttonBox.setPadding(new Insets(10, 0, 0, 0));
 
         root.getChildren().addAll(titleLabel, serverMessages, buttonBox);
 
-        Scene scene = new Scene(root, 400, 300);
+        Scene scene = new Scene(root, 400, 230);
         primaryStage.setScene(scene);
 
         singleplayerBtn.setOnAction(e -> sendChoice("1"));
@@ -153,23 +182,38 @@ public class TetrisLobbyGUI extends Application {
     }
 
     private void showMultiplayerLobby() {
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(15));
+        VBox root = new VBox(12);
+        root.setPadding(new Insets(22, 22, 22, 22));
+        root.setSpacing(10);
+        root.setBackground(new Background(new BackgroundFill(Color.web("#f8fafc"), new CornerRadii(8), Insets.EMPTY)));
+        root.setBorder(new Border(new BorderStroke(Color.web("#c5ccd7"), BorderStrokeStyle.SOLID, new CornerRadii(8), new BorderWidths(2))));
 
         Label lobbyLabel = new Label("Multiplayer Lobby");
+        lobbyLabel.setFont(Font.font("System", FontWeight.BOLD, 15));
+        lobbyLabel.setTextFill(Color.web("#33415c"));
+
         playerListBox = new VBox(5);
+        playerListBox.setPadding(new Insets(8, 12, 8, 12));
+        playerListBox.setBackground(new Background(new BackgroundFill(Color.web("#e7ecf3"), new CornerRadii(6), Insets.EMPTY)));
+        playerListBox.setBorder(new Border(new BorderStroke(Color.web("#d5dde7"), BorderStrokeStyle.SOLID, new CornerRadii(6), new BorderWidths(1))));
         playerListBox.getChildren().add(new Label("Waiting for players..."));
 
-        readyStatusLabel = new Label("Ready: " + readyPlayers +"/" + totalPlayers);
+        readyStatusLabel = new Label("Ready: " + readyPlayers + "/" + totalPlayers);
+        readyStatusLabel.setFont(Font.font("System", FontWeight.BOLD, 12));
+        readyStatusLabel.setTextFill(Color.web("#246b5d"));
+
         readyButton = new Button("Ready");
+        readyButton.setFont(Font.font("System", FontWeight.BOLD, 12));
+        readyButton.setBackground(new Background(new BackgroundFill(Color.web("#e3e9f6"), new CornerRadii(5), Insets.EMPTY)));
+        readyButton.setTextFill(Color.web("#33415c"));
         readyButton.setOnAction(e -> {
             try {
                 readyButton.setDisable(true);
                 readyButton.setText("Ready!");
-                readyButton.setStyle("-fx-background-color: green; -fx-text-fill: white;");
+                readyButton.setBackground(new Background(new BackgroundFill(Color.web("#b4e2af"), new CornerRadii(5), Insets.EMPTY)));
+                readyButton.setTextFill(Color.web("#246b5d"));
                 readyStatusLabel.setText("Ready: " + (readyPlayers + 1) + "/" + totalPlayers);
                 readyPlayers++;
-                // Send READY signal to server
                 out.writeObject("READY");
                 out.flush();
             } catch (IOException ex) {
@@ -179,7 +223,7 @@ public class TetrisLobbyGUI extends Application {
 
         root.getChildren().addAll(lobbyLabel, playerListBox, readyStatusLabel, readyButton);
 
-        Scene lobbyScene = new Scene(root, 400, 300);
+        Scene lobbyScene = new Scene(root, 400, 260);
         primaryStage.setScene(lobbyScene);
     }
 

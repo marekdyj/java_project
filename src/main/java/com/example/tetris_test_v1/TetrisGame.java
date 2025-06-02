@@ -182,7 +182,10 @@ public class TetrisGame implements Serializable {
         }
     }
 
-    private TetriminoType getNextTetrimino() {
+    public TetriminoType getNextTetriminoType() {
+        return nextTetrimino;
+    }
+    public TetriminoType getNextTetrimino() {
         if( lastUsedIndex >= lastUsedTetriminos.length) {
             for(int i=0;i<lastUsedTetriminos.length;i++){
                 lastUsedTetriminos[i]=null;
