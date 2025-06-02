@@ -4,11 +4,11 @@ import com.example.tetris_test_v1.tetrimino.Tetrimino;
 import com.example.tetris_test_v1.tetrimino.TetriminoType;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -39,6 +39,10 @@ public class GameWindow {
 
     private final TetrisGame game;
     private Map<String, Canvas> playerCanvases = new ConcurrentHashMap<>();
+    private Map<String, TetriminoType> playerNextTypes = new ConcurrentHashMap<>();
+    private Map<String, Canvas> playerNextCanvases = new ConcurrentHashMap<>();
+    private Map<String, Label> playerScoreLabels = new ConcurrentHashMap<>();
+    private Map<String, Label> playerLevelLabels = new ConcurrentHashMap<>();
     private String nickname;
     private String[] players;
 
@@ -46,8 +50,6 @@ public class GameWindow {
     private final ObjectInputStream in;
     private final ObjectOutputStream out;
 
-    // Next Tetrimino Preview
-    private Canvas nextTetriminoCanvas;
     private static final int NEXT_BLOCK_SIZE = 24; // slightly smaller for preview
     private static final int NEXT_CANVAS_SIZE = NEXT_BLOCK_SIZE * 4;
 
@@ -87,8 +89,14 @@ public class GameWindow {
             String player = players[i];
             boolean isLocal = nickname.equals(player);
 
+            // Main container for player: HBox (board left, info right)
+            HBox playerContainer = new HBox(14);
+            playerContainer.setAlignment(Pos.TOP_LEFT);
+
+            // Board VBox
             VBox playerBoard = new VBox(8);
             playerBoard.setPadding(new Insets(11, 11, 11, 11));
+            playerBoard.setAlignment(Pos.TOP_CENTER);
 
             if (isLocal) {
                 playerBoard.setBackground(new Background(new BackgroundFill(Color.web("#eef5fd"), new CornerRadii(14), Insets.EMPTY)));
@@ -100,45 +108,57 @@ public class GameWindow {
                 playerBoard.setEffect(new DropShadow(7, Color.web("#dbe3ea", 0.10)));
             }
 
-            // Label
             Label playerLabel = new Label(player);
-            playerLabel.setFont(Font.font("Segoe UI", isLocal ? FontWeight.BOLD : FontWeight.NORMAL, isLocal ? 17 : 15));
+            playerLabel.setFont(Font.font("Segoe UI", isLocal ? FontWeight.BOLD : FontWeight.MEDIUM, isLocal ? 17 : 15));
             playerLabel.setPadding(new Insets(0, 0, 2, 0));
-            playerLabel.setTextFill(isLocal ? Color.web("#4682b4") : Color.web("#61768d"));
+            playerLabel.setTextFill(isLocal ? Color.web("#1c4a76") : Color.web("#61768d"));
 
-            // Canvas
             Canvas canvas = new Canvas(BOARD_WIDTH * BLOCK_SIZE, BOARD_HEIGHT * BLOCK_SIZE);
             canvas.setEffect(new DropShadow(isLocal ? 10 : 6, isLocal ? Color.web("#a6c8f5", 0.12) : Color.web("#b0becb", 0.10)));
             playerCanvases.put(player, canvas);
 
             playerBoard.getChildren().addAll(playerLabel, canvas);
-            boardsContainer.getChildren().add(playerBoard);
 
-            // Gap between players
+            // Info VBox (right of the board): Next, Score, Level
+            VBox infoBox = new VBox(12);
+            infoBox.setAlignment(Pos.TOP_CENTER);
+            infoBox.setPadding(new Insets(11, 10, 11, 5));
+            infoBox.setMinWidth(110);
+
+            Label nextLabel = new Label("NEXT");
+            nextLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 13));
+            nextLabel.setTextFill(Color.web("#355c9b"));
+            nextLabel.setStyle("-fx-letter-spacing: 1.5; -fx-background-color: #eaf1fb; -fx-padding: 4 0 4 0; -fx-background-radius: 7;");
+
+            Canvas nextCanvas = new Canvas(NEXT_CANVAS_SIZE, NEXT_CANVAS_SIZE);
+            nextCanvas.setEffect(new DropShadow(6, Color.web("#b3c8e6", 0.13)));
+            playerNextCanvases.put(player, nextCanvas);
+
+            Label scoreLabel = new Label("Score: 0");
+            scoreLabel.setFont(Font.font("Consolas", FontWeight.BOLD, 16));
+            scoreLabel.setTextFill(Color.web("#2d517c"));
+            scoreLabel.setStyle("-fx-background-color: #eaf1fb; -fx-padding: 6 16 6 16; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #b3c8e6; -fx-border-width: 1.1;");
+            playerScoreLabels.put(player, scoreLabel);
+
+            Label levelLabel = new Label("Level: 1");
+            levelLabel.setFont(Font.font("Consolas", FontWeight.SEMI_BOLD, 15));
+            levelLabel.setTextFill(Color.web("#5271a6"));
+            levelLabel.setStyle("-fx-background-color: #f2f5fa; -fx-padding: 4 16 4 16; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #d5e4f2; -fx-border-width: 1.0;");
+            playerLevelLabels.put(player, levelLabel);
+
+            infoBox.getChildren().addAll(nextLabel, nextCanvas, scoreLabel, levelLabel);
+
+            playerContainer.getChildren().addAll(playerBoard, infoBox);
+            boardsContainer.getChildren().add(playerContainer);
+
             if (i < players.length - 1) {
                 Region sep = new Region();
-                sep.setPrefWidth(10);
+                sep.setPrefWidth(14);
                 boardsContainer.getChildren().add(sep);
             }
         }
 
-        // Next tetrimino preview
-        VBox rightPanel = new VBox(14);
-        rightPanel.setPadding(new Insets(20, 24, 20, 24));
-        rightPanel.setBackground(new Background(new BackgroundFill(Color.web("#f4f6fa"), new CornerRadii(16), Insets.EMPTY)));
-
-        Label nextLabel = new Label("Next:");
-        nextLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
-        nextLabel.setTextFill(Color.web("#4682b4"));
-
-        nextTetriminoCanvas = new Canvas(NEXT_CANVAS_SIZE, NEXT_CANVAS_SIZE);
-        nextTetriminoCanvas.setEffect(new DropShadow(6, Color.web("#b3c8e6", 0.14)));
-
-        rightPanel.getChildren().addAll(nextLabel, nextTetriminoCanvas);
-
-        // Adding to stage
         root.setCenter(boardsContainer);
-        root.setRight(rightPanel);
 
         Scene scene = new Scene(root);
         stage.setScene(scene);
@@ -150,7 +170,6 @@ public class GameWindow {
         new Thread(() -> {
             while (true) {
                 try {
-                    // Handle flashing animation
                     if (game.isClearingInProgress()) {
                         for (int i = 0; i < 6; i++) {
                             renderBoard(i % 2 == 0); // Flash ON and OFF
@@ -163,6 +182,13 @@ public class GameWindow {
                 }
                 updateGame();
                 renderBoard();
+
+                int currentScore = game.getScore();
+                int currentLevel = game.getLevel();
+                updateScoreLabel(nickname, currentScore);
+                updateLevelLabel(nickname, currentLevel);
+                updateNextPreview(nickname);
+
                 try {
                     int level=game.getLevel()-1;
                     int speedup=0;
@@ -175,6 +201,60 @@ public class GameWindow {
                 }
             }
         }).start();
+    }
+
+    private void updateScoreLabel(String player, int score) {
+        Label scoreLabel = playerScoreLabels.get(player);
+        if (scoreLabel != null) {
+            Platform.runLater(() -> scoreLabel.setText("Score: " + score));
+        }
+    }
+
+    private void updateLevelLabel(String player, int level) {
+        Label levelLabel = playerLevelLabels.get(player);
+        if (levelLabel != null) {
+            Platform.runLater(() -> levelLabel.setText("Level: " + level));
+        }
+    }
+
+    private void updateNextPreview(String player) {
+        Canvas canvas = playerNextCanvases.get(player);
+        if (canvas == null) return;
+
+        // Get nextType for that player (local or remote)
+        TetriminoType nextType = playerNextTypes.get(player);
+        if (nextType == null) return;
+
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.clearRect(0, 0, NEXT_CANVAS_SIZE, NEXT_CANVAS_SIZE);
+
+        gc.setStroke(Color.LIGHTGRAY);
+        gc.setLineWidth(1.2);
+        gc.strokeRect(2, 2, NEXT_CANVAS_SIZE - 4, NEXT_CANVAS_SIZE - 4);
+
+        int previewOffset = 2;
+        Position[] previewShape = nextType.createInstance(previewOffset, previewOffset, new int[6][6]).getShape();
+
+        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
+        for (Position p : previewShape) {
+            if (p.x < minX) minX = p.x;
+            if (p.y < minY) minY = p.y;
+            if (p.x > maxX) maxX = p.x;
+            if (p.y > maxY) maxY = p.y;
+        }
+        int shapeWidth = maxY - minY + 1;
+        int shapeHeight = maxX - minX + 1;
+
+        int offsetX = (NEXT_CANVAS_SIZE - shapeWidth * NEXT_BLOCK_SIZE) / 2;
+        int offsetY = (NEXT_CANVAS_SIZE - shapeHeight * NEXT_BLOCK_SIZE) / 2;
+
+        int[] spriteCoords = {0, 0};
+        for (Position pos : previewShape) {
+            int drawX = offsetX + (pos.y - minY) * NEXT_BLOCK_SIZE;
+            int drawY = offsetY + (pos.x - minX) * NEXT_BLOCK_SIZE;
+            drawBlockPreview(gc, drawX, drawY, spriteCoords[0], spriteCoords[1]);
+        }
     }
 
     private void setupControls() {
@@ -199,11 +279,11 @@ public class GameWindow {
         }
     }
 
-    // default flash = false
     public void renderBoard() {
         renderBoard(false);
     }
     private void renderBoard(boolean flash) {
+        playerNextTypes.put(nickname, game.getNextTetriminoType());
         Canvas gameCanvas = playerCanvases.get(nickname);
         if (gameCanvas != null) {
             GraphicsContext gc = gameCanvas.getGraphicsContext2D();
@@ -227,7 +307,6 @@ public class GameWindow {
             }
 
             if (!game.isClearingInProgress()) {
-                // Draw current piece
                 Tetrimino current = game.getCurrentTetrimino();
                 if (current != null) {
                     for (Position pos : current.getShape()) {
@@ -237,53 +316,19 @@ public class GameWindow {
             }
         }
 
-        drawNextTetriminoPreview();
+        // Update ALL next previews, score, level for all players
+        for (String player : players) {
+            updateNextPreview(player);
+            if (playerScoreLabels.containsKey(player) && playerLevelLabels.containsKey(player)) {
+                if (player.equals(nickname)) {
+                    updateScoreLabel(player, game.getScore());
+                    updateLevelLabel(player, game.getLevel());
+                }
+                // For remote players: would update from receiveBoardUpdate
+            }
+        }
 
-        // Wyślij board do serwera
         sendBoardUpdate();
-    }
-
-    private void drawNextTetriminoPreview() {
-        if (nextTetriminoCanvas == null) return;
-        // Get the next TetriminoType
-        TetriminoType nextType = game.getNextTetriminoType();
-        if (nextType == null) return;
-
-        GraphicsContext gc = nextTetriminoCanvas.getGraphicsContext2D();
-        gc.clearRect(0, 0, NEXT_CANVAS_SIZE, NEXT_CANVAS_SIZE);
-
-        // Draw a border for clarity
-        gc.setStroke(Color.GRAY);
-        gc.setLineWidth(2);
-        gc.strokeRect(2, 2, NEXT_CANVAS_SIZE-4, NEXT_CANVAS_SIZE-4);
-
-        // Get the shape for preview (centered)
-        int previewOffset = 2;
-        Position[] previewShape = nextType.createInstance(previewOffset, previewOffset, new int[6][6]).getShape();
-
-        // Find min/max to center
-        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE;
-        int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
-        for (Position p : previewShape) {
-            if (p.x < minX) minX = p.x;
-            if (p.y < minY) minY = p.y;
-            if (p.x > maxX) maxX = p.x;
-            if (p.y > maxY) maxY = p.y;
-        }
-        int shapeWidth = maxY - minY + 1;
-        int shapeHeight = maxX - minX + 1;
-
-        int offsetX = (NEXT_CANVAS_SIZE - shapeWidth * NEXT_BLOCK_SIZE) / 2;
-        int offsetY = (NEXT_CANVAS_SIZE - shapeHeight * NEXT_BLOCK_SIZE) / 2;
-
-        // For sprite coloring (level 0 for preview)
-        int[] spriteCoords = {0, 0};
-
-        for (Position pos : previewShape) {
-            int drawX = offsetX + (pos.y - minY) * NEXT_BLOCK_SIZE;
-            int drawY = offsetY + (pos.x - minX) * NEXT_BLOCK_SIZE;
-            drawBlockPreview(gc, drawX, drawY, spriteCoords[0], spriteCoords[1]);
-        }
     }
 
     private void drawBlockPreview(GraphicsContext gc, int px, int py, int tileX, int tileY) {
@@ -298,11 +343,10 @@ public class GameWindow {
     }
 
     private void sendBoardUpdate() {
-        synchronized(out) {
+        synchronized (out) {
             try {
                 int[][] currentBoard = game.getBoard();
-                BoardUpdate update = new BoardUpdate(nickname, currentBoard, game.getLevel(),game.getScore());
-                System.out.println("Sending board update: " + update); // Debug
+                BoardUpdate update = new BoardUpdate(nickname, currentBoard, game.getNextTetriminoType(), game.getLevel(), game.getScore());
                 out.writeObject(update);
                 out.reset();
                 out.flush();
@@ -315,18 +359,19 @@ public class GameWindow {
     public void receiveBoardUpdate(BoardUpdate update) {
         String targetNickname = update.nickname();
         int[][] board = update.board();
-        int score= update.score();
-        int level= update.level();
+        TetriminoType nextType = update.nextTetriminoType();
+        int score = update.score();
+        int level = update.level();
 
         Platform.runLater(() -> {
-            System.out.println("Received update for: " + targetNickname); // Debug
-            System.out.println("Level:"+level+", Score: "+score+", Board content: " + update); // Debug
-
+            playerNextTypes.put(targetNickname, nextType);
             Canvas targetCanvas = playerCanvases.get(targetNickname);
             if (targetCanvas != null && !game.isClearingInProgress()) {
                 drawRemoteBoard(targetCanvas, board);
-            } else {
-                System.out.println("Canvas is null for: " + targetNickname);
+                updateNextPreview(targetNickname);
+                updateScoreLabel(targetNickname, score);
+                updateLevelLabel(targetNickname, level);
+                updateNextPreview(targetNickname); // For remote players, this just clears their preview
             }
         });
     }
@@ -355,7 +400,6 @@ public class GameWindow {
         }
     }
 
-    // default flash = false
     private void drawBlock(GraphicsContext gc, int x, int y, int blockState) {
         drawBlock(gc, x, y, blockState, false);
     }
