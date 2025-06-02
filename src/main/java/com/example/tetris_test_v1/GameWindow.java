@@ -49,6 +49,7 @@ public class GameWindow {
     private TextArea serverMessages;
     private final ObjectInputStream in;
     private final ObjectOutputStream out;
+    private boolean sentLastGame = false;
 
     private static final int NEXT_BLOCK_SIZE = 24; // slightly smaller for preview
     private static final int NEXT_CANVAS_SIZE = NEXT_BLOCK_SIZE * 4;
@@ -327,8 +328,12 @@ public class GameWindow {
                 // For remote players: would update from receiveBoardUpdate
             }
         }
-
-        sendBoardUpdate();
+        if(!sentLastGame) {
+            sendBoardUpdate();
+            if(!game.isGameOver()){
+                sentLastGame = true; // Mark as sent to avoid resending
+            }
+        }
     }
 
     private void drawBlockPreview(GraphicsContext gc, int px, int py, int tileX, int tileY) {
