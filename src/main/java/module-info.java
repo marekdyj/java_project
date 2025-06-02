@@ -4,6 +4,7 @@ module com.example.tetris_test_v1 {
 
     requires org.controlsfx.controls;
     requires org.kordamp.bootstrapfx.core;
+    requires java.sql;
 
     opens com.example.tetris_test_v1 to javafx.fxml;
     exports com.example.tetris_test_v1;

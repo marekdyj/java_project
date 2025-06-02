@@ -3,6 +3,7 @@ package com.example.tetris_test_v1;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.sql.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
@@ -18,10 +19,19 @@ public class TetrisServer {
     private static final int MAX_ROOM_SIZE = 4;
     private static final List<GameRoom> gameRooms = Collections.synchronizedList(new ArrayList<>());
     private static final ExecutorService clientThreadPool = Executors.newCachedThreadPool();
+    static FileLogger logger = new FileLogger("application.log");
 
     public static void main(String[] args) {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            logger.log("Aplikacja została zamknięta.");
+        }));
+
+        DataBaseCreator.init();
+
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             System.out.println("Tetris server is running on port " + PORT);
+            logger.log("Aplikacja została uruchomiona.");
+
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
