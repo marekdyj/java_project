@@ -346,7 +346,7 @@ public class GameWindow {
         synchronized (out) {
             try {
                 int[][] currentBoard = game.getBoard();
-                BoardUpdate update = new BoardUpdate(nickname, currentBoard, game.getNextTetriminoType(), game.getLevel(), game.getScore());
+                BoardUpdate update = new BoardUpdate(nickname, currentBoard, game.getNextTetriminoType(), game.getLevel(), game.getScore(),!game.isGameOver());
                 out.writeObject(update);
                 out.reset();
                 out.flush();
@@ -362,12 +362,13 @@ public class GameWindow {
         TetriminoType nextType = update.nextTetriminoType();
         int score = update.score();
         int level = update.level();
+        boolean gameOver = update.gameOver();
 
         Platform.runLater(() -> {
             playerNextTypes.put(targetNickname, nextType);
             Canvas targetCanvas = playerCanvases.get(targetNickname);
             if (targetCanvas != null && !game.isClearingInProgress()) {
-                drawRemoteBoard(targetCanvas, board);
+                drawRemoteBoard(targetCanvas, board,gameOver);
                 updateNextPreview(targetNickname);
                 updateScoreLabel(targetNickname, score);
                 updateLevelLabel(targetNickname, level);
@@ -376,10 +377,12 @@ public class GameWindow {
         });
     }
 
-    private void drawRemoteBoard(Canvas canvas, int[][] board) {
+    private void drawRemoteBoard(Canvas canvas, int[][] board,boolean remoteGameOver) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-
+        if( remoteGameOver ) {
+            //TODO: wyświetlanie game over dla innych graczy
+        }
         for (int y = 0; y < BOARD_HEIGHT; y++) {
             for (int x = 0; x < BOARD_WIDTH; x++) {
                 if (board[y][x] != 0) {

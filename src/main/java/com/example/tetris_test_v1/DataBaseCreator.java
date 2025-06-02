@@ -38,7 +38,8 @@ public class DataBaseCreator {
                 CREATE TABLE IF NOT EXISTS users (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     username VARCHAR(50) NOT NULL UNIQUE,
-                    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    highscore_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    highscore INT DEFAULT 0
                 ) ENGINE=InnoDB
             """);
 

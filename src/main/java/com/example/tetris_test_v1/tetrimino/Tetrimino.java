@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import com.example.tetris_test_v1.Position;
 
-// TODO: ktorys klocek zle sie rotuje/ zamienia na inny
 public abstract class Tetrimino implements Serializable {
     protected Position[] shape;
     protected int x, y;
@@ -24,8 +23,7 @@ public abstract class Tetrimino implements Serializable {
             pos.setY(pos.y + offsetY);
         }
         if (checkOverlap(shape)) {
-            // TODO: dodac game over
-            throw new IllegalStateException("Game Over - Tetrimino overlaps at spawn");
+            //throw new IllegalStateException("Game Over - Tetrimino overlaps at spawn");
         }
         putDown();
     }

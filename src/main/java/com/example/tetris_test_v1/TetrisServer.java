@@ -25,8 +25,8 @@ public class TetrisServer {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             logger.log("Aplikacja została zamknięta.");
         }));
-
-        DataBaseCreator.init();
+        //TODO: Inicjalizacja bazy danych, dokładne przyjrzenie sie temu
+        //DataBaseCreator.init();
 
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             System.out.println("Tetris server is running on port " + PORT);
@@ -90,6 +90,10 @@ public class TetrisServer {
                         }
                     } else if (incoming instanceof BoardUpdate boardObj) {
                         System.out.println("Received board from " + nickname);
+                        if(boardObj.gameOver()){
+                            System.out.println("Game over for player " + nickname);
+
+                        }
                         if (currentRoom != null) {
                             // Broadcast to other players in the room
                             currentRoom.broadcastBoardUpdate(boardObj, this);
@@ -211,7 +215,6 @@ public class TetrisServer {
             String initialGameState = "Game initialized with default settings.";
             broadcast("GAME_STATE:" + initialGameState);
 
-            // TODO: Dodaj logikę gry właściwej
             System.out.println("Game started for room with " + players.size() + " players.");
         }
 

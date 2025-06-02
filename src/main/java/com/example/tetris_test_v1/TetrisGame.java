@@ -34,11 +34,11 @@ public class TetrisGame implements Serializable {
         spawnNewTetrimino();
     }
 
-    public void loadBoard(int[][] newBoard, Tetrimino tetrimino) {
-        board = newBoard;
-        currentTetrimino = tetrimino;
-    }
-    //TODO: implement tetrimino movement, check collision befor move, if bottom reached->lock
+    //TODO:sprawdzić czy to jest potrzebne
+//    public void loadBoard(int[][] newBoard, Tetrimino tetrimino) {
+//        board = newBoard;
+//        currentTetrimino = tetrimino;
+//    }
 
     private void checkLines() {
         // Utwórz tablice lini do usunięcia (dla ułatwienia)
@@ -109,24 +109,26 @@ public class TetrisGame implements Serializable {
         clearingInProgress = false;
     }
 
-
-    private void removeLine(int line) {
-        for (int i = line; i > 0; i--) {
-            System.arraycopy(board[i-1], 0, board[i], 0, board[0].length);
-        }
-        Arrays.fill(board[0], 0);
-    }
+    //TODO:sprawdzić czy to jest potrzebne
+//    private void removeLine(int line) {
+//        for (int i = line; i > 0; i--) {
+//            System.arraycopy(board[i-1], 0, board[i], 0, board[0].length);
+//        }
+//        Arrays.fill(board[0], 0);
+//    }
 
     private void updateScore(int lines) {
         score += level*lines*lines * 100;
     }
 
     private void spawnNewTetrimino() {
+        if(board[2][4]==1 || board[2][5]==1 || board[2][6]==1) {
+            gameOver=true;
+            doGameOver();
+            return;
+        }
         currentTetrimino = nextTetrimino.createInstance(2, 5, board);
         nextTetrimino = getNextTetrimino();
-        if (currentTetrimino.checkOverlap(currentTetrimino.getShape())) {
-            gameOver = true;
-        }
     }
 
     public int[][] getBoard() {
@@ -170,6 +172,9 @@ public class TetrisGame implements Serializable {
     }
 
     public void update() {
+        if (gameOver) {
+            return;
+        }
         if (!currentTetrimino.checkCollision(1, 0)
                 || currentTetrimino.checkOutOfBounds(currentTetrimino.getShape())) {
             currentTetrimino.move(1, 0);
@@ -211,5 +216,12 @@ public class TetrisGame implements Serializable {
     }
     public int getScore() {
         return score;
+    }
+    public void doGameOver(){
+        if( currentTetrimino != null ) {
+            currentTetrimino.lock();
+        }
+        System.out.println("Game Over! Your score: " + score);
+
     }
 }
