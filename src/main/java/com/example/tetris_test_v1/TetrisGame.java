@@ -208,6 +208,7 @@ public class TetrisGame implements Serializable {
             currentTetrimino.lock();
         }
         System.out.println("Game Over! Your score: " + score);
+        //TODO:wyszarzyć własną plansze
 
     }
 }
