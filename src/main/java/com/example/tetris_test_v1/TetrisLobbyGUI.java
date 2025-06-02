@@ -227,15 +227,6 @@ public class TetrisLobbyGUI extends Application {
         primaryStage.setScene(lobbyScene);
     }
 
-//    private void sendReadySignal() {
-//        try {
-//            out.writeObject("READY");
-//            out.flush();
-//        } catch (IOException e) {
-//            appendMessage("Failed to send READY signal.");
-//        }
-//    }
-
     private void showGameWindow() {
         Platform.runLater(() -> {
             Stage gameStage = new Stage();
@@ -280,6 +271,9 @@ public class TetrisLobbyGUI extends Application {
             } else {
                 appendMessage("Server: " + msg);
             }
+        }
+        else if(msg.contains("NEW_HIGHSCORE")) {
+            //TODO:wyświetlanie komunikatu o nowym rekordzie
         }
 
     }

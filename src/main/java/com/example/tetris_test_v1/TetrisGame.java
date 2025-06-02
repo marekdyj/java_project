@@ -34,12 +34,6 @@ public class TetrisGame implements Serializable {
         spawnNewTetrimino();
     }
 
-    //TODO:sprawdzić czy to jest potrzebne
-//    public void loadBoard(int[][] newBoard, Tetrimino tetrimino) {
-//        board = newBoard;
-//        currentTetrimino = tetrimino;
-//    }
-
     private void checkLines() {
         // Utwórz tablice lini do usunięcia (dla ułatwienia)
         Arrays.fill(linesToClear, false);
@@ -108,14 +102,6 @@ public class TetrisGame implements Serializable {
         Arrays.fill(linesToClear, false);
         clearingInProgress = false;
     }
-
-    //TODO:sprawdzić czy to jest potrzebne
-//    private void removeLine(int line) {
-//        for (int i = line; i > 0; i--) {
-//            System.arraycopy(board[i-1], 0, board[i], 0, board[0].length);
-//        }
-//        Arrays.fill(board[0], 0);
-//    }
 
     private void updateScore(int lines) {
         score += level*lines*lines * 100;

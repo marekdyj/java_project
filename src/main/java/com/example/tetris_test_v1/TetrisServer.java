@@ -1,5 +1,7 @@
 package com.example.tetris_test_v1;
 
+import javafx.scene.chart.PieChart;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -26,7 +28,7 @@ public class TetrisServer {
             logger.log("Aplikacja została zamknięta.");
         }));
         //TODO: Inicjalizacja bazy danych, dokładne przyjrzenie sie temu
-        //DataBaseCreator.init();
+        DataBaseConnector.init();
 
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             System.out.println("Tetris server is running on port " + PORT);
@@ -92,7 +94,11 @@ public class TetrisServer {
                         System.out.println("Received board from " + nickname);
                         if(boardObj.gameOver()){
                             System.out.println("Game over for player " + nickname);
-
+                            int currentHighScore=DataBaseConnector.getHighscore(nickname);
+                            if(boardObj.score()>currentHighScore) {
+                                DataBaseConnector.updateHighscore(nickname, boardObj.score());
+                            send("NEW_HIGHSCORE");
+                            }
                         }
                         if (currentRoom != null) {
                             // Broadcast to other players in the room
