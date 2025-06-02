@@ -60,3 +60,9 @@
 [2025-06-02 17:58:16] Aplikacja została zamknięta.
 [2025-06-02 18:07:20] Aplikacja została uruchomiona.
 [2025-06-02 18:09:52] Aplikacja została zamknięta.
+[2025-06-02 18:22:49] Aplikacja została uruchomiona.
+[2025-06-02 18:22:53] Nowy klient połączony: /127.0.0.1
+[2025-06-02 18:22:57] Received message from a: READY
+[2025-06-02 18:25:27] Game over for player a
+[2025-06-02 18:25:27] New high score for player a: 2100
+[2025-06-02 18:25:40] Aplikacja została zamknięta.

@@ -21,13 +21,12 @@ public class TetrisServer {
     private static final int MAX_ROOM_SIZE = 4;
     private static final List<GameRoom> gameRooms = Collections.synchronizedList(new ArrayList<>());
     private static final ExecutorService clientThreadPool = Executors.newCachedThreadPool();
-    static FileLogger logger = new FileLogger("application.log");
+    static FileLogger logger = new FileLogger("server.log");
 
     public static void main(String[] args) {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             logger.log("Aplikacja została zamknięta.");
         }));
-        //TODO: Inicjalizacja bazy danych, dokładne przyjrzenie sie temu
         DataBaseConnector.init();
 
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
@@ -38,6 +37,7 @@ public class TetrisServer {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("New client connected: " + clientSocket.getInetAddress());
+                logger.log("Nowy klient połączony: " + clientSocket.getInetAddress());
                 clientThreadPool.execute(new ClientHandler(clientSocket));
             }
 
@@ -81,6 +81,7 @@ public class TetrisServer {
                     Object incoming = input.readObject();
                     if (incoming instanceof String message) {
                         System.out.println("Received message from " + nickname + ": " + message);
+                        logger.log("Received message from " + nickname + ": " + message);
 
                         if (message.equals("READY")) {
                             if (currentRoom != null) {
@@ -94,10 +95,12 @@ public class TetrisServer {
                         System.out.println("Received board from " + nickname);
                         if(boardObj.gameOver()){
                             System.out.println("Game over for player " + nickname);
+                            logger.log("Game over for player " + nickname);
                             int currentHighScore=DataBaseConnector.getHighscore(nickname);
                             if(boardObj.score()>currentHighScore) {
                                 DataBaseConnector.updateHighscore(nickname, boardObj.score());
-                            send("NEW_HIGHSCORE");
+                                send("NEW_HIGHSCORE");
+                                logger.log("New high score for player " + nickname + ": " + boardObj.score());
                             }
                         }
                         if (currentRoom != null) {
@@ -108,6 +111,7 @@ public class TetrisServer {
                         }
                     } else {
                         System.out.println("Received unknown object from " + nickname);
+                        logger.log("Received unknown object from " + nickname);
                     }
                 }
 
