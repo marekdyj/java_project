@@ -206,7 +206,6 @@ public class GameWindow {
 
                 int playerScore = game.getScore();
 
-
                 int price = trollPrices.getOrDefault(selectedTroll, Integer.MAX_VALUE);
                 if (playerScore < price) {
                     buyButton.setStyle("-fx-background-color: #ff6b6b; -fx-padding: 6 20 6 20; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #a9bedc; -fx-border-width: 1.0;");
@@ -480,6 +479,12 @@ public class GameWindow {
         if (gameCanvas != null) {
             GraphicsContext gc = gameCanvas.getGraphicsContext2D();
             gc.clearRect(0, 0, gameCanvas.getWidth(), gameCanvas.getHeight());
+
+            if (isFlashEffect) {
+                gc.setFill(Color.WHITE);
+                gc.fillRect(0, 0, gameCanvas.getWidth(), gameCanvas.getHeight());
+                return;
+            }
 
             int[][] board = game.getBoard();
             for (int y = 0; y < BOARD_HEIGHT; y++) {
