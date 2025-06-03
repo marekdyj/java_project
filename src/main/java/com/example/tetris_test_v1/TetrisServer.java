@@ -91,8 +91,21 @@ public class TetrisServer {
                                 System.err.println("Error: currentRoom is null for player " + nickname);
                             }
                         }
+                        if (message.startsWith("TROLL:")) {
+                            String[] parts = message.split(":");
+                            if (parts.length == 3) {
+                                String trollType = parts[1];
+                                String targetId = parts[2];
+                                System.out.println("avdvdvdvd");
+
+                                Troll(trollType, targetId);
+
+                            }
+
+                        }
+
                     } else if (incoming instanceof BoardUpdate boardObj) {
-                        System.out.println("Received board from " + nickname);
+                        //System.out.println("Received board from " + nickname);
                         if(boardObj.gameOver()){
                             System.out.println("Game over for player " + nickname);
                             logger.log("Game over for player " + nickname);
@@ -147,6 +160,20 @@ public class TetrisServer {
                 output.writeObject(message);
                 output.reset();
                 output.flush();
+            }
+        }
+
+        public void Troll(String trollType, String targetId ) {
+            for (ClientHandler player : currentRoom.players) {
+                if (player.nickname.equals(targetId)) {
+                    try {
+                        player.send("STROLL:" + trollType);
+                        System.out.println("Sender: " + this.nickname + "; Sent Troll to: " + player.getNickname());
+                    } catch (IOException e) {
+                        System.err.println("Failed to Troll to " + player.getNickname());
+                        e.printStackTrace();
+                    }
+            }
             }
         }
 
@@ -233,7 +260,7 @@ public class TetrisServer {
                 if (player != sender) {
                     try {
                         player.send(boardUpdate);
-                        System.out.println("Sender: " + boardUpdate.nickname() + "; Sent board update to: " + player.getNickname());
+                        //System.out.println("Sender: " + boardUpdate.nickname() + "; Sent board update to: " + player.getNickname());
                     } catch (IOException e) {
                         System.err.println("Failed to send board update to " + player.getNickname());
                         e.printStackTrace();

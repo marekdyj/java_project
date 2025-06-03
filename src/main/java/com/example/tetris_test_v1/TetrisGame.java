@@ -211,4 +211,8 @@ public class TetrisGame implements Serializable {
         //TODO:wyszarzyć własną plansze
 
     }
+
+    public void setScore(int nscore) {
+        score = nscore;
+    }
 }

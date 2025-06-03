@@ -8,13 +8,17 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -34,6 +38,14 @@ public class GameWindow {
     private static final int BOARD_HEIGHT = 22;
     private static final int SPRITE_BLOCK_PIXEL_SIZE = 8; // 8px na blok w spritesheet
 
+    private volatile boolean isEffect = false;
+    private volatile boolean isSlowEffect = false;
+    private volatile boolean isReverseEffect = false;
+    private volatile boolean isFreezEffect = false;
+    private volatile boolean isFlashEffect = false;
+
+
+
     private final Stage stage;
     private Image spriteSheet;
 
@@ -45,11 +57,19 @@ public class GameWindow {
     private Map<String, Label> playerLevelLabels = new ConcurrentHashMap<>();
     private String nickname;
     private String[] players;
+    private final Map<String, Integer> trollPrices = Map.of(
+            "Freez", 1500,
+            "Slow", 1000,
+            "Flashbang", 2000,
+            "Reverse", 1500
+    );
 
     private TextArea serverMessages;
     private final ObjectInputStream in;
     private final ObjectOutputStream out;
     private boolean sentLastGame = false;
+
+
 
     private static final int NEXT_BLOCK_SIZE = 24; // slightly smaller for preview
     private static final int NEXT_CANVAS_SIZE = NEXT_BLOCK_SIZE * 4;
@@ -82,6 +102,8 @@ public class GameWindow {
         boardsContainer.setPadding(new Insets(10, 8, 10, 8));
         boardsContainer.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY)));
 
+        root.requestFocus();
+
         if (players == null || players.length == 0) {
             players = new String[]{nickname}; // Fallback to self
         }
@@ -89,6 +111,9 @@ public class GameWindow {
         for (int i = 0; i < players.length; i++) {
             String player = players[i];
             boolean isLocal = nickname.equals(player);
+            //setupControls();
+            root.requestFocus();
+
 
             // Main container for player: HBox (board left, info right)
             HBox playerContainer = new HBox(14);
@@ -147,8 +172,80 @@ public class GameWindow {
             levelLabel.setStyle("-fx-background-color: #f2f5fa; -fx-padding: 4 16 4 16; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #d5e4f2; -fx-border-width: 1.0;");
             playerLevelLabels.put(player, levelLabel);
 
-            infoBox.getChildren().addAll(nextLabel, nextCanvas, scoreLabel, levelLabel);
+            ComboBox<String> trollTypeComboBox = new ComboBox<>();
+            trollTypeComboBox.getItems().addAll("Freez", "Slow", "Flashbang","Reverse");
+            trollTypeComboBox.setPromptText("Wybierz czar");
+            trollTypeComboBox.setStyle("-fx-background-color: #eaf1fb; -fx-padding: 6 12 6 12; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #b3c8e6; -fx-border-width: 1.1;");
+            trollTypeComboBox.setVisibleRowCount(5);
+            trollTypeComboBox.setPrefWidth(160);
+            trollTypeComboBox.setOnAction(e -> {
+                root.requestFocus();
+            });
 
+            game.setScore(100000);
+
+            ComboBox<String> trollTargetComboBox = new ComboBox<>();
+            trollTargetComboBox.getItems().addAll(players);
+            trollTargetComboBox.setPromptText("Wybierz cel trola");
+            trollTargetComboBox.setStyle("-fx-background-color: #f9f9ff; -fx-padding: 6 12 6 12; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #c5d3ea; -fx-border-width: 1.1;");
+            trollTargetComboBox.setPrefWidth(160);
+            trollTargetComboBox.setOnAction(e -> {
+                root.requestFocus();
+            });
+
+            Button buyButton = new Button("Kup");
+            buyButton.setFont(Font.font("Consolas", FontWeight.BOLD, 14));
+            buyButton.setTextFill(Color.web("#2d517c"));
+            buyButton.setStyle("-fx-background-color: #d8e6fa; -fx-padding: 6 20 6 20; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #a9bedc; -fx-border-width: 1.0;");
+            buyButton.setOnAction(e -> {
+                String selectedTroll = trollTypeComboBox.getValue();
+                String selectedTarget = trollTargetComboBox.getValue();
+                if (selectedTroll == null || selectedTarget == null) {
+                    return;
+                }
+
+                int playerScore = game.getScore();
+
+
+                int price = trollPrices.getOrDefault(selectedTroll, Integer.MAX_VALUE);
+                if (playerScore < price) {
+                    buyButton.setStyle("-fx-background-color: #ff6b6b; -fx-padding: 6 20 6 20; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #a9bedc; -fx-border-width: 1.0;");
+
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ignored) {}
+
+                        Platform.runLater(() -> {
+                            buyButton.setStyle("-fx-background-color: #d8e6fa; -fx-padding: 6 20 6 20; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #a9bedc; -fx-border-width: 1.0;");
+                        });
+                    }).start();
+                } else {
+                    sendTroll("TROLL:" + selectedTroll + ":" + selectedTarget);
+                    game.setScore(playerScore - price);
+                    buyButton.setStyle("-fx-background-color: #a6f0a6; -fx-padding: 6 20 6 20; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #a9bedc; -fx-border-width: 1.0;");
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ignored) {}
+
+                        Platform.runLater(() -> {
+                            buyButton.setStyle("-fx-background-color: #d8e6fa; -fx-padding: 6 20 6 20; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #a9bedc; -fx-border-width: 1.0;");
+                        });
+                    }).start();
+
+                }
+                root.requestFocus();
+            });
+
+
+            if (isLocal) {
+                infoBox.getChildren().addAll(nextLabel, nextCanvas, scoreLabel, levelLabel, trollTypeComboBox,trollTargetComboBox, buyButton);
+            }
+            else {
+                infoBox.getChildren().addAll(nextLabel, nextCanvas, scoreLabel, levelLabel);
+
+            }
             playerContainer.getChildren().addAll(playerBoard, infoBox);
             boardsContainer.getChildren().add(playerContainer);
 
@@ -165,6 +262,9 @@ public class GameWindow {
         stage.setScene(scene);
         stage.setTitle("Tetris Game");
         stage.show();
+
+        root.setFocusTraversable(true);
+        Platform.runLater(() -> root.requestFocus());
     }
 
     private void setupGameLoop() {
@@ -196,13 +296,71 @@ public class GameWindow {
                     if(level<=9) speedup=level*77;
                     else speedup=693+(level-9)*3;
                     if(speedup>720)speedup=720; // Maksymalna prędkość
-                    Thread.sleep(800-speedup); // Sleep for 1 second
+
+                    int baseSleep = 800 - speedup;
+
+                    if(!isFreezEffect) {
+                        if (isSlowEffect) {
+                            baseSleep *= 3; // spowolnienie 3x
+                        }
+                        Thread.sleep(baseSleep - speedup);
+                    }
+                    else {
+                        Thread.sleep(8000);
+                    }
                 } catch (InterruptedException e) {
                     break;
                 }
             }
         }).start();
     }
+
+    public void triggerEffect(String trollType) {
+        if (isEffect) return;
+        isEffect = true;
+
+        System.out.println(trollType);
+
+        switch (trollType) {
+            case "Slow":
+                isSlowEffect = true;
+                break;
+            case "Freez":
+                isFreezEffect = true;
+                break;
+            case "Flashbang":
+                isFlashEffect = true;
+                break;
+            case "Reverse":
+                isReverseEffect = true;
+                break;
+
+        }
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(4000);
+            } catch (InterruptedException ignored) {}
+
+            switch (trollType) {
+                case "Slow":
+                    isSlowEffect = false;
+                    break;
+                case "Freez":
+                    isFreezEffect = false;
+                    break;
+                case "Flashbang":
+                    isFlashEffect = false;
+                    break;
+                case "Reverse":
+                    isReverseEffect = false;
+                    break;
+            }
+
+            isEffect = false;
+        }).start();
+    }
+
 
     private void updateScoreLabel(String player, int score) {
         Label scoreLabel = playerScoreLabels.get(player);
@@ -262,14 +420,47 @@ public class GameWindow {
         stage.getScene().setOnKeyPressed(event -> {
             KeyCode key = event.getCode();
             if (game.getCurrentTetrimino() != null && !game.isClearingInProgress() && game.isGameOver()) {
-                switch (key) {
-                    case LEFT: game.moveLeft(); break;
-                    case RIGHT: game.moveRight(); break;
-                    case DOWN: game.moveDown(); break;
-                    case UP: game.rotate(); break;
-                    case SPACE: game.hardDrop(); break;
+                if (!isReverseEffect) {
+                    switch (key) {
+                        case LEFT:
+                            game.moveLeft();
+                            break;
+                        case RIGHT:
+                            game.moveRight();
+                            break;
+                        case DOWN:
+                            game.moveDown();
+                            break;
+                        case UP:
+                            game.rotate();
+                            break;
+                        case SPACE:
+                            game.hardDrop();
+                            break;
+                    }
+                }
+                else {
+                    switch (key) {
+                    case LEFT:
+                        game.moveRight();
+                        break;
+                    case RIGHT:
+                        game.moveLeft();
+                        break;
+                    case DOWN:
+                        game.moveDown();
+                        break;
+                    case UP:
+                        game.rotate();
+                        break;
+                    case SPACE:
+                        game.hardDrop();
+                        break;
+                }
+
                 }
                 renderBoard();
+                event.consume();
             }
         });
     }
@@ -344,6 +535,18 @@ public class GameWindow {
         } else {
             gc.setFill(Color.LIGHTGRAY);
             gc.fillRect(px, py, NEXT_BLOCK_SIZE, NEXT_BLOCK_SIZE);
+        }
+    }
+
+
+
+    private void sendTroll(String troll) {
+        try {
+            System.out.println("wyslano trola");
+            out.writeObject(troll);
+            out.flush();
+        } catch (IOException e) {
+            appendMessage("Error sending data to server.");
         }
     }
 

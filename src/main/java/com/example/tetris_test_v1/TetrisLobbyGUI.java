@@ -250,6 +250,13 @@ public class TetrisLobbyGUI extends Application {
             readyPlayers = Integer.parseInt(parts[0]);
             totalPlayers = Integer.parseInt(parts[1]);
             Platform.runLater(() -> readyStatusLabel.setText("Ready: " + readyPlayers + "/" + totalPlayers));
+
+        } else if (msg.contains("STROLL:")) {
+            String[] parts = msg.split(":");
+            String trollType = parts[1];
+            System.out.println(trollType + "aaaaaaa");
+            gameWindow.triggerEffect(trollType);
+
         } else if (msg.contains("START_GAME")) {
             System.out.println("Starting game window...");
             showGameWindow();
@@ -268,7 +275,13 @@ public class TetrisLobbyGUI extends Application {
                 System.out.println("Game state updated: " + gameState);
             } else if (msg.contains("ERROR:")) {
                 appendMessage("Error: " + msg.substring(6));
-            } else {
+            } else if (msg.contains("STROLL:")) {
+                String[] parts = msg.split(":");
+                    String trollType = parts[1];
+                    System.out.println(trollType + "aaaaaaa");
+                    gameWindow.triggerEffect(trollType);
+            }
+            else {
                 appendMessage("Server: " + msg);
             }
         }
