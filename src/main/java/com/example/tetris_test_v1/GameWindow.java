@@ -5,6 +5,7 @@ import com.example.tetris_test_v1.tetrimino.TetriminoType;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -23,8 +24,10 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+import java.io.Console;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -511,6 +514,21 @@ public class GameWindow {
                     }
                 }
             }
+
+            if (!game.isGameOver()) {
+                gc = gameCanvas.getGraphicsContext2D();
+
+                gc.setFill(Color.rgb(255, 0, 0, 0.5));
+                gc.fillRect(0, 0, gameCanvas.getWidth(), gameCanvas.getHeight());
+                gc.setFill(Color.rgb(255, 255, 255, 0.8));
+                gc.setFont(Font.font("Segoe UI", FontWeight.BOLD, 36));
+                gc.setTextAlign(TextAlignment.CENTER);
+                gc.setTextBaseline(VPos.CENTER);
+                gc.fillText("GAME OVER", gameCanvas.getWidth() / 2, gameCanvas.getHeight() / 2);
+
+            }
+
+
         }
 
         // Update ALL next previews, score, level for all players
@@ -527,7 +545,8 @@ public class GameWindow {
         if(!sentLastGame) {
             sendBoardUpdate();
             if(!game.isGameOver()){
-                sentLastGame = true; // Mark as sent to avoid resending
+                sentLastGame = true;
+                sendBoardUpdate();// Mark as sent to avoid resending
             }
         }
     }
@@ -576,6 +595,7 @@ public class GameWindow {
         int score = update.score();
         int level = update.level();
         boolean gameOver = update.gameOver();
+        System.out.println(gameOver + "asdasdasdasdadasd");
 
         Platform.runLater(() -> {
             playerNextTypes.put(targetNickname, nextType);
@@ -593,15 +613,27 @@ public class GameWindow {
     private void drawRemoteBoard(Canvas canvas, int[][] board,boolean remoteGameOver) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        if( remoteGameOver ) {
-            //TODO: wyświetlanie game over dla innych graczy
-        }
+
+        //System.out.println("ppppppppppppppppppp");
+
         for (int y = 0; y < BOARD_HEIGHT; y++) {
             for (int x = 0; x < BOARD_WIDTH; x++) {
                 if (board[y][x] != 0) {
                     drawBlock(gc, x, y, board[y][x]);
                 }
             }
+        }
+
+        if(remoteGameOver) {
+
+            gc = canvas.getGraphicsContext2D();
+            gc.setFill(Color.rgb(255, 0, 0, 0.5));
+            gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+            gc.setFill(Color.rgb(255, 255, 255, 0.8));
+            gc.setFont(Font.font("Segoe UI", FontWeight.BOLD, 36));
+            gc.setTextAlign(TextAlignment.CENTER);
+            gc.setTextBaseline(VPos.CENTER);
+            gc.fillText("GAME OVER", canvas.getWidth() / 2, canvas.getHeight() / 2);
         }
     }
 
