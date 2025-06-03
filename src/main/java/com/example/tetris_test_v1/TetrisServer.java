@@ -185,7 +185,7 @@ public class TetrisServer {
         private void joinOrCreateRoom() throws IOException {
             synchronized (gameRooms) {
                 for (GameRoom room : gameRooms) {
-                    if (!room.isFull()) {
+                    if (!room.isFull()&& !room.isStarted()) {
                         room.addPlayer(this);
                         this.currentRoom = room;
                         send("Joined existing room.");
@@ -204,6 +204,7 @@ public class TetrisServer {
     // --- Pokój gry dla maksymalnie 4 graczy ---
     static class GameRoom {
         private final List<ClientHandler> players = new ArrayList<>();
+        private boolean started = false;
 
         public synchronized void addPlayer(ClientHandler player) {
             players.add(player);
@@ -217,6 +218,10 @@ public class TetrisServer {
 
         public boolean isFull() {
             return players.size() >= MAX_ROOM_SIZE;
+        }
+
+        public boolean isStarted(){
+            return started;
         }
 
         public void broadcast(String message) {
@@ -240,6 +245,7 @@ public class TetrisServer {
         }
 
         private void startGame() {
+            started=true;
             // Utwórz liste graczy (oddzielone przecinkiem)
             String playerList = players.stream()
                     .map(ClientHandler::getNickname)
