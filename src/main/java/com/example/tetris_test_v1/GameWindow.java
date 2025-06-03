@@ -595,7 +595,7 @@ public class GameWindow {
         int score = update.score();
         int level = update.level();
         boolean gameOver = update.gameOver();
-        System.out.println(gameOver + "asdasdasdasdadasd");
+
 
         Platform.runLater(() -> {
             playerNextTypes.put(targetNickname, nextType);
@@ -614,7 +614,6 @@ public class GameWindow {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        //System.out.println("ppppppppppppppppppp");
 
         for (int y = 0; y < BOARD_HEIGHT; y++) {
             for (int x = 0; x < BOARD_WIDTH; x++) {
