@@ -94,6 +94,14 @@ public class GameWindow {
         spriteSheet = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/sprites/NES_Tetris_Block_Tiles.png")));
     }
 
+    private Label createTrollPriceLabel(String troll, int price) {
+        Label label = new Label(troll + ": " + price);
+        label.setFont(Font.font("Segoe UI", FontWeight.BOLD, 15));
+        label.setTextFill(Color.web("#355c9b"));
+        label.setStyle("-fx-background-color: #f2f5fa; -fx-padding: 7 18 7 18; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #b3c8e6; -fx-border-width: 1.1;");
+        return label;
+    }
+
     private void initializeUI() {
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(18));
@@ -111,18 +119,17 @@ public class GameWindow {
             players = new String[]{nickname}; // Fallback to self
         }
 
-        for (int i = 0; i < players.length; i++) {
-            String player = players[i];
+        double enemyScale = 0.33;
+        double enemyLabelScale = 0.77;
+        VBox enemyBoardsVBox = new VBox(18);
+        enemyBoardsVBox.setAlignment(Pos.TOP_CENTER);
+
+        for (String player : players) {
             boolean isLocal = nickname.equals(player);
-            //setupControls();
-            root.requestFocus();
 
-
-            // Main container for player: HBox (board left, info right)
             HBox playerContainer = new HBox(14);
             playerContainer.setAlignment(Pos.TOP_LEFT);
 
-            // Board VBox
             VBox playerBoard = new VBox(8);
             playerBoard.setPadding(new Insets(11, 11, 11, 11));
             playerBoard.setAlignment(Pos.TOP_CENTER);
@@ -141,9 +148,17 @@ public class GameWindow {
             playerLabel.setFont(Font.font("Segoe UI", isLocal ? FontWeight.BOLD : FontWeight.MEDIUM, isLocal ? 17 : 15));
             playerLabel.setPadding(new Insets(0, 0, 2, 0));
             playerLabel.setTextFill(isLocal ? Color.web("#1c4a76") : Color.web("#61768d"));
+            if (!isLocal) playerLabel.setScaleX(enemyLabelScale); // pomniejsz label przeciwnika
+            if (!isLocal) playerLabel.setScaleY(enemyLabelScale);
 
-            Canvas canvas = new Canvas(BOARD_WIDTH * BLOCK_SIZE, BOARD_HEIGHT * BLOCK_SIZE);
-            canvas.setEffect(new DropShadow(isLocal ? 10 : 6, isLocal ? Color.web("#a6c8f5", 0.12) : Color.web("#b0becb", 0.10)));
+            Canvas canvas;
+            if (isLocal) {
+                canvas = new Canvas(BOARD_WIDTH * BLOCK_SIZE, BOARD_HEIGHT * BLOCK_SIZE);
+                canvas.setEffect(new DropShadow(10, Color.web("#a6c8f5", 0.12)));
+            } else {
+                canvas = new Canvas(BOARD_WIDTH * BLOCK_SIZE * enemyScale, BOARD_HEIGHT * BLOCK_SIZE * enemyScale);
+                canvas.setEffect(new DropShadow(6, Color.web("#b0becb", 0.10)));
+            }
             playerCanvases.put(player, canvas);
 
             playerBoard.getChildren().addAll(playerLabel, canvas);
@@ -152,49 +167,56 @@ public class GameWindow {
             VBox infoBox = new VBox(12);
             infoBox.setAlignment(Pos.TOP_CENTER);
             infoBox.setPadding(new Insets(11, 10, 11, 5));
-            infoBox.setMinWidth(110);
+            infoBox.setMinWidth(isLocal ? 140 : 90);
 
-            Label nextLabel = new Label("NEXT");
-            nextLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 13));
-            nextLabel.setTextFill(Color.web("#355c9b"));
-            nextLabel.setStyle("-fx-letter-spacing: 1.5; -fx-background-color: #eaf1fb; -fx-padding: 4 0 4 0; -fx-background-radius: 7;");
-
-            Canvas nextCanvas = new Canvas(NEXT_CANVAS_SIZE, NEXT_CANVAS_SIZE);
-            nextCanvas.setEffect(new DropShadow(6, Color.web("#b3c8e6", 0.13)));
-            playerNextCanvases.put(player, nextCanvas);
-
+            // Score i Level
             Label scoreLabel = new Label("Score: 0");
-            scoreLabel.setFont(Font.font("Consolas", FontWeight.BOLD, 16));
+            scoreLabel.setFont(Font.font("Consolas", FontWeight.BOLD, isLocal ? 16 : 12));
             scoreLabel.setTextFill(Color.web("#2d517c"));
-            scoreLabel.setStyle("-fx-background-color: #eaf1fb; -fx-padding: 6 16 6 16; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #b3c8e6; -fx-border-width: 1.1;");
+            scoreLabel.setStyle("-fx-background-color: #eaf1fb; -fx-padding: 6 32 6 32; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #b3c8e6; -fx-border-width: 1.1;");
+            scoreLabel.setMinWidth(isLocal ? 120 : 70);
+            if (!isLocal) {
+                scoreLabel.setScaleX(enemyLabelScale);
+                scoreLabel.setScaleY(enemyLabelScale);
+            }
             playerScoreLabels.put(player, scoreLabel);
 
             Label levelLabel = new Label("Level: 1");
-            levelLabel.setFont(Font.font("Consolas", FontWeight.SEMI_BOLD, 15));
+            levelLabel.setFont(Font.font("Consolas", FontWeight.SEMI_BOLD, isLocal ? 15 : 11));
             levelLabel.setTextFill(Color.web("#5271a6"));
-            levelLabel.setStyle("-fx-background-color: #f2f5fa; -fx-padding: 4 16 4 16; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #d5e4f2; -fx-border-width: 1.0;");
+            levelLabel.setStyle("-fx-background-color: #f2f5fa; -fx-padding: 4 32 4 32; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #d5e4f2; -fx-border-width: 1.0;");
+            levelLabel.setMinWidth(isLocal ? 120 : 70);
+            if (!isLocal) {
+                levelLabel.setScaleX(enemyLabelScale);
+                levelLabel.setScaleY(enemyLabelScale);
+            }
             playerLevelLabels.put(player, levelLabel);
 
-            ComboBox<String> trollTypeComboBox = new ComboBox<>();
-            trollTypeComboBox.getItems().addAll("Freez", "Slow", "Flashbang","Reverse");
-            trollTypeComboBox.setPromptText("Wybierz czar");
-            trollTypeComboBox.setStyle("-fx-background-color: #eaf1fb; -fx-padding: 6 12 6 12; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #b3c8e6; -fx-border-width: 1.1;");
-            trollTypeComboBox.setVisibleRowCount(5);
-            trollTypeComboBox.setPrefWidth(160);
-            trollTypeComboBox.setOnAction(e -> {
-                root.requestFocus();
-            });
+            if (isLocal) {
+                // NEXT tylko dla gracza lokalnego
+                Label nextLabel = new Label("NEXT");
+                nextLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 13));
+                nextLabel.setTextFill(Color.web("#355c9b"));
+                nextLabel.setStyle("-fx-letter-spacing: 1.5; -fx-background-color: #eaf1fb; -fx-padding: 4 0 4 0; -fx-background-radius: 7;");
 
-            game.setScore(100000);
+                Canvas nextCanvas = new Canvas(NEXT_CANVAS_SIZE, NEXT_CANVAS_SIZE);
+                nextCanvas.setEffect(new DropShadow(6, Color.web("#b3c8e6", 0.13)));
+                playerNextCanvases.put(player, nextCanvas);
 
-            ComboBox<String> trollTargetComboBox = new ComboBox<>();
-            trollTargetComboBox.getItems().addAll(players);
-            trollTargetComboBox.setPromptText("Wybierz cel trola");
-            trollTargetComboBox.setStyle("-fx-background-color: #f9f9ff; -fx-padding: 6 12 6 12; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #c5d3ea; -fx-border-width: 1.1;");
-            trollTargetComboBox.setPrefWidth(160);
-            trollTargetComboBox.setOnAction(e -> {
-                root.requestFocus();
-            });
+                ComboBox<String> trollTypeComboBox = new ComboBox<>();
+                trollTypeComboBox.getItems().addAll("Freez", "Slow", "Flashbang", "Reverse");
+                trollTypeComboBox.setPromptText("Wybierz czar");
+                trollTypeComboBox.setStyle("-fx-background-color: #eaf1fb; -fx-padding: 6 12 6 12; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #b3c8e6; -fx-border-width: 1.1;");
+                trollTypeComboBox.setVisibleRowCount(5);
+                trollTypeComboBox.setPrefWidth(160);
+                trollTypeComboBox.setOnAction(e -> root.requestFocus());
+
+                ComboBox<String> trollTargetComboBox = new ComboBox<>();
+                trollTargetComboBox.getItems().addAll(players);
+                trollTargetComboBox.setPromptText("Wybierz cel trola");
+                trollTargetComboBox.setStyle("-fx-background-color: #f9f9ff; -fx-padding: 6 12 6 12; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #c5d3ea; -fx-border-width: 1.1;");
+                trollTargetComboBox.setPrefWidth(160);
+                trollTargetComboBox.setOnAction(e -> root.requestFocus());
 
             Button buyButton = new Button("Kup");
             buyButton.setFont(Font.font("Consolas", FontWeight.BOLD, 14));
@@ -240,33 +262,53 @@ public class GameWindow {
                 root.requestFocus();
             });
 
+                infoBox.getChildren().addAll(nextLabel, nextCanvas, scoreLabel, levelLabel, trollTypeComboBox, trollTargetComboBox, buyButton);
 
-            if (isLocal) {
-                infoBox.getChildren().addAll(nextLabel, nextCanvas, scoreLabel, levelLabel, trollTypeComboBox,trollTargetComboBox, buyButton);
-            }
-            else {
-                infoBox.getChildren().addAll(nextLabel, nextCanvas, scoreLabel, levelLabel);
+                // Odstęp między planszą a cenami (dol)
+                VBox gapBox = new VBox();
+                gapBox.setMinHeight(30); // wysokość odstępu
+                gapBox.setMaxHeight(30);
 
-            }
-            playerContainer.getChildren().addAll(playerBoard, infoBox);
-            boardsContainer.getChildren().add(playerContainer);
+                VBox mainBoardWithGap = new VBox(0, playerBoard, gapBox); // plansza + odstęp
+                mainBoardWithGap.setAlignment(Pos.TOP_CENTER);
 
-            if (i < players.length - 1) {
-                Region sep = new Region();
-                sep.setPrefWidth(14);
-                boardsContainer.getChildren().add(sep);
+                playerContainer.getChildren().addAll(mainBoardWithGap, infoBox);
+                boardsContainer.getChildren().add(playerContainer);
+            } else {
+                // Przeciwnik: tylko score i level (pomniejszone)
+                infoBox.getChildren().addAll(scoreLabel, levelLabel);
+                playerContainer.getChildren().addAll(playerBoard, infoBox);
+                enemyBoardsVBox.getChildren().add(playerContainer);
             }
         }
 
+        boardsContainer.getChildren().add(enemyBoardsVBox);
         root.setCenter(boardsContainer);
 
-        Scene scene = new Scene(root);
+        //Ceny "trolli" u dołu
+        HBox trollPricesBox = new HBox(30);
+        trollPricesBox.setAlignment(Pos.CENTER);
+        trollPricesBox.setPadding(new Insets(16, 0, 8, 0));
+        trollPricesBox.setStyle("-fx-background-color: #eaf1fb; -fx-background-radius: 12;");
+        trollPricesBox.getChildren().addAll(
+                createTrollPriceLabel("Freez", trollPrices.get("Freez")),
+                createTrollPriceLabel("Slow", trollPrices.get("Slow")),
+                createTrollPriceLabel("Flashbang", trollPrices.get("Flashbang")),
+                createTrollPriceLabel("Reverse", trollPrices.get("Reverse"))
+        );
+        root.setBottom(trollPricesBox);
+
+
+        Scene scene = new Scene(root,850,950); // Ustawienie rozmiaru okna
         stage.setScene(scene);
         stage.setTitle("Tetris Game");
+        stage.setResizable(false); //blokada zmiany rozmiaru okna
         stage.show();
 
         root.setFocusTraversable(true);
         Platform.runLater(() -> root.requestFocus());
+
+
     }
 
     private void setupGameLoop() {
@@ -495,7 +537,7 @@ public class GameWindow {
                     if (board[y][x] != 0) {
                         if (game.isClearingInProgress() && game.isLineMarkedForClear(y)) {
                             if (flash) {
-                                drawBlock(gc, x, y, board[y][x], true);
+                                drawBlock(gc, x, y, board[y][x], true, 1.0); // Flashing effect
                             } else {
                                 drawBlock(gc, x, y, board[y][x]);
                             }
@@ -618,7 +660,7 @@ public class GameWindow {
         for (int y = 0; y < BOARD_HEIGHT; y++) {
             for (int x = 0; x < BOARD_WIDTH; x++) {
                 if (board[y][x] != 0) {
-                    drawBlock(gc, x, y, board[y][x]);
+                    drawBlock(gc, x, y, board[y][x], false, 0.33);
                 }
             }
         }
@@ -648,12 +690,12 @@ public class GameWindow {
     }
 
     private void drawBlock(GraphicsContext gc, int x, int y, int blockState) {
-        drawBlock(gc, x, y, blockState, false);
+        drawBlock(gc, x, y, blockState, false, 1.0);
     }
-    private void drawBlock(GraphicsContext gc, int x, int y, int blockState, boolean flashingEffect) {
+    private void drawBlock(GraphicsContext gc, int x, int y, int blockState, boolean flashingEffect,double scale) {
         if (flashingEffect) {
             gc.setFill(Color.WHITE);
-            gc.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+            gc.fillRect(x * BLOCK_SIZE*scale, y * BLOCK_SIZE*scale, BLOCK_SIZE*scale, BLOCK_SIZE*scale);
             return;
         }
         try {
@@ -661,7 +703,7 @@ public class GameWindow {
             WritableImage blockImage = getBlockSprite(spriteCoords[0], spriteCoords[1]);
             if (blockImage != null) {
                 gc.setImageSmoothing(false); // Zapobiegaj rozmyciu podczas skalowania
-                gc.drawImage(blockImage, x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                gc.drawImage(blockImage, x * BLOCK_SIZE*scale, y * BLOCK_SIZE*scale, BLOCK_SIZE*scale, BLOCK_SIZE*scale);
             }
         } catch (Exception e) {
             System.err.println("Error(drawBlock): Failed to draw block at (" + x + ", " + y + ")");
