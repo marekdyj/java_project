@@ -671,7 +671,7 @@ public class GameWindow {
             gc.setFill(Color.rgb(255, 0, 0, 0.5));
             gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
             gc.setFill(Color.rgb(255, 255, 255, 0.8));
-            gc.setFont(Font.font("Segoe UI", FontWeight.BOLD, 36));
+            gc.setFont(Font.font("Segoe UI", FontWeight.BOLD, 36*0.33));
             gc.setTextAlign(TextAlignment.CENTER);
             gc.setTextBaseline(VPos.CENTER);
             gc.fillText("GAME OVER", canvas.getWidth() / 2, canvas.getHeight() / 2);

@@ -1,1 +1,36 @@
 
+[2025-06-04 01:03:23] Aplikacja została uruchomiona.
+[2025-06-04 01:03:25] Nowy klient połączony: /127.0.0.1
+[2025-06-04 01:03:27] Nowy klient połączony: /127.0.0.1
+[2025-06-04 01:03:28] Nowy klient połączony: /127.0.0.1
+[2025-06-04 01:03:37] Received message from c: READY
+[2025-06-04 01:03:38] Received message from b: READY
+[2025-06-04 01:03:38] Received message from a: READY
+[2025-06-04 01:03:46] Game over for player c
+[2025-06-04 01:03:46] New high score for player c: 0
+[2025-06-04 01:03:46] Game over for player c
+[2025-06-04 01:03:46] New high score for player c: 0
+[2025-06-04 01:03:50] Game over for player b
+[2025-06-04 01:03:50] New high score for player b: 0
+[2025-06-04 01:03:50] Game over for player b
+[2025-06-04 01:03:50] New high score for player b: 0
+[2025-06-04 01:03:52] Game over for player a
+[2025-06-04 01:03:52] New high score for player a: 0
+[2025-06-04 01:03:52] Game over for player a
+[2025-06-04 01:03:52] New high score for player a: 0
+[2025-06-04 01:04:01] Aplikacja została zamknięta.
+[2025-06-04 01:06:34] Aplikacja została uruchomiona.
+[2025-06-04 01:06:35] Nowy klient połączony: /127.0.0.1
+[2025-06-04 01:06:37] Nowy klient połączony: /127.0.0.1
+[2025-06-04 01:06:40] Received message from a: READY
+[2025-06-04 01:06:45] Aplikacja została zamknięta.
+[2025-06-04 01:06:46] Aplikacja została uruchomiona.
+[2025-06-04 01:06:48] Nowy klient połączony: /127.0.0.1
+[2025-06-04 01:06:49] Nowy klient połączony: /127.0.0.1
+[2025-06-04 01:06:53] Received message from a: READY
+[2025-06-04 01:06:54] Received message from b: READY
+[2025-06-04 01:06:56] Game over for player b
+[2025-06-04 01:06:56] New high score for player b: 0
+[2025-06-04 01:06:56] Game over for player b
+[2025-06-04 01:06:56] New high score for player b: 0
+[2025-06-04 01:07:31] Aplikacja została zamknięta.
