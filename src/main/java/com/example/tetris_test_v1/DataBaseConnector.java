@@ -11,6 +11,7 @@ public class DataBaseConnector {
         private static final String dbName = "baza_tetris";
         private static final String user = "root";
         private static final String password = "";
+        private static final String dbUrl = "jdbc:mysql://localhost:3306/" + dbName + "?serverTimezone=UTC";
 
     public static void init() {
 
@@ -53,7 +54,6 @@ public class DataBaseConnector {
     }
 
     public static void updateHighscore(String username, int score) {
-        String dbUrl = "jdbc:mysql://localhost:3306/" + dbName + "?serverTimezone=UTC";
 
         try (Connection conn = DriverManager.getConnection(dbUrl, user, password);
              Statement stmt = conn.createStatement()) {
@@ -68,7 +68,6 @@ public class DataBaseConnector {
         }
     }
     public static int getHighscore(String username) {
-        String dbUrl = "jdbc:mysql://localhost:3306/" + dbName + "?serverTimezone=UTC";
         int highscore = -1;
 
         try (Connection conn = DriverManager.getConnection(dbUrl, user, password);
@@ -87,7 +86,6 @@ public class DataBaseConnector {
     }
 
     public static List<LeaderboardEntry> getTop10() {
-        String dbUrl = "jdbc:mysql://localhost:3306/" + dbName + "?serverTimezone=UTC";
         List<LeaderboardEntry> top10 = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(dbUrl, user, password);
              Statement stmt = conn.createStatement();
@@ -103,7 +101,6 @@ public class DataBaseConnector {
     }
 
     public static LeaderboardEntry getUserRanking(String username) {
-        String dbUrl = "jdbc:mysql://localhost:3306/" + dbName + "?serverTimezone=UTC";
         int userScore = getHighscore(username);
         int place = 1;
         try (Connection conn = DriverManager.getConnection(dbUrl, user, password);
@@ -119,7 +116,6 @@ public class DataBaseConnector {
     }
 
     public static void fillWithSampleData() {
-        String dbUrl = "jdbc:mysql://localhost:3306/" + dbName + "?serverTimezone=UTC";
         String[] usernames = {
                 "Anna", "Bartek", "Cezary", "Dorota", "Ewa", "Filip", "Grzegorz", "Hania", "Iga", "Jan",
                 "Kamil", "Lena", "Marek", "Natalia", "Oskar", "Patryk", "Rafał", "Sandra", "Tomasz", "Ula"
