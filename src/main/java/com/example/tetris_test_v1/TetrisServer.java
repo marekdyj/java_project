@@ -205,9 +205,9 @@ public class TetrisServer {
             broadcast("Player " + player.getNickname() + " joined. Current: " + players.size());
             broadcastReadyStatus();
 
-            if (players.size() == MAX_ROOM_SIZE) {
-                startGame();
-            }
+//            if (players.size() == MAX_ROOM_SIZE) {
+//                startGame();
+//            }
         }
 
         public boolean isFull() {

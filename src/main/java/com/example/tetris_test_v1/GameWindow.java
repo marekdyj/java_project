@@ -73,6 +73,7 @@ public class GameWindow {
     private final ObjectInputStream in;
     private final ObjectOutputStream out;
     private boolean sentLastGame = false;
+    private boolean receivedFirstBoardUpdate = false;
 
 
 
@@ -703,8 +704,6 @@ public class GameWindow {
         }
     }
 
-
-
     private void sendTroll(String troll) {
         try {
             System.out.println("wyslano trola");
@@ -730,6 +729,15 @@ public class GameWindow {
     }
 
     public void receiveBoardUpdate(BoardUpdate update) {
+        if(!receivedFirstBoardUpdate) {
+            receivedFirstBoardUpdate = true;
+            try{
+                Thread.sleep(1000);
+            }
+            catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
         String targetNickname = update.nickname();
         int[][] board = update.board();
         TetriminoType nextType = update.nextTetriminoType();
