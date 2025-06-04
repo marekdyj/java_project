@@ -845,9 +845,22 @@ public class GameWindow {
 
             String formattedScore = formatScore(score);
 
+            HBox scoreBox = new HBox(10);
+            scoreBox.setAlignment(Pos.CENTER);
+
             Label scoreLabel = new Label("Twój wynik: " + formattedScore);
             scoreLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 18));
             scoreLabel.setTextFill(Color.web("#355c9b"));
+
+            int highscore = DataBaseConnector.getHighscore(nickname);
+            scoreBox.getChildren().add(scoreLabel);
+
+            if (score>highscore){
+                Label newHighScoreLabel = new Label("Nowy rekord!");
+                newHighScoreLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
+                newHighScoreLabel.setTextFill(Color.web("#e67e22"));
+                scoreBox.getChildren().add(newHighScoreLabel);
+            }
 
             Label levelLabel = new Label("Osiągnięty poziom: " + level);
             levelLabel.setFont(Font.font("Segoe UI", FontWeight.NORMAL, 16));
@@ -877,7 +890,7 @@ public class GameWindow {
             });
 
             buttonBox.getChildren().addAll(menuBtn, exitBtn);
-            root.getChildren().addAll(gameOverLabel, scoreLabel, levelLabel, buttonBox);
+            root.getChildren().addAll(gameOverLabel, scoreBox, levelLabel, buttonBox);
 
             Scene scene = new Scene(root, 350, 260);
             gameOverStage.setScene(scene);
