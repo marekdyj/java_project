@@ -34,3 +34,53 @@
 [2025-06-04 01:06:56] Game over for player b
 [2025-06-04 01:06:56] New high score for player b: 0
 [2025-06-04 01:07:31] Aplikacja została zamknięta.
+[2025-06-04 11:45:40] Aplikacja została uruchomiona.
+[2025-06-04 11:45:42] Nowy klient połączony: /127.0.0.1
+[2025-06-04 11:45:49] Received message from a: READY
+[2025-06-04 11:45:52] Game over for player a
+[2025-06-04 11:45:52] New high score for player a: 0
+[2025-06-04 11:45:52] Game over for player a
+[2025-06-04 11:45:52] New high score for player a: 0
+[2025-06-04 11:45:52] Nowy klient połączony: /127.0.0.1
+[2025-06-04 11:45:55] Received message from a: READY
+[2025-06-04 11:45:58] Game over for player a
+[2025-06-04 11:45:58] New high score for player a: 0
+[2025-06-04 11:45:58] Game over for player a
+[2025-06-04 11:45:58] New high score for player a: 0
+[2025-06-04 11:46:04] Aplikacja została zamknięta.
+[2025-06-04 11:46:25] Aplikacja została uruchomiona.
+[2025-06-04 11:46:27] Nowy klient połączony: /127.0.0.1
+[2025-06-04 11:46:29] Received message from a: READY
+[2025-06-04 11:46:31] Game over for player a
+[2025-06-04 11:46:31] New high score for player a: 0
+[2025-06-04 11:46:31] Game over for player a
+[2025-06-04 11:46:31] New high score for player a: 0
+[2025-06-04 11:46:32] Nowy klient połączony: /127.0.0.1
+[2025-06-04 11:46:35] Aplikacja została zamknięta.
+[2025-06-04 11:52:10] Aplikacja została uruchomiona.
+[2025-06-04 11:52:12] Nowy klient połączony: /127.0.0.1
+[2025-06-04 11:52:15] Received message from a: READY
+[2025-06-04 11:52:22] Aplikacja została zamknięta.
+[2025-06-04 11:53:05] Aplikacja została uruchomiona.
+[2025-06-04 11:53:06] Nowy klient połączony: /127.0.0.1
+[2025-06-04 11:53:10] Received message from q: READY
+[2025-06-04 11:53:12] Received message from q: TROLL:Freez:q
+[2025-06-04 11:53:19] Received message from q: TROLL:Slow:q
+[2025-06-04 11:53:24] Received message from q: TROLL:Flashbang:q
+[2025-06-04 11:53:31] Aplikacja została zamknięta.
+[2025-06-04 11:57:10] Aplikacja została uruchomiona.
+[2025-06-04 11:57:12] Nowy klient połączony: /127.0.0.1
+[2025-06-04 11:57:15] Received message from a: READY
+[2025-06-04 11:57:16] Received message from a: TROLL:Freez:a
+[2025-06-04 11:57:20] Aplikacja została zamknięta.
+[2025-06-04 11:57:28] Aplikacja została uruchomiona.
+[2025-06-04 11:57:30] Nowy klient połączony: /127.0.0.1
+[2025-06-04 11:57:32] Received message from a: READY
+[2025-06-04 11:57:36] Received message from a: TROLL:Freez:a
+[2025-06-04 11:57:38] Received message from a: TROLL:Slow:a
+[2025-06-04 11:57:46] Received message from a: TROLL:Slow:a
+[2025-06-04 11:57:49] Aplikacja została zamknięta.
+[2025-06-04 11:58:00] Aplikacja została uruchomiona.
+[2025-06-04 11:58:03] Nowy klient połączony: /127.0.0.1
+[2025-06-04 11:58:05] Received message from a: READY
+[2025-06-04 11:58:11] Aplikacja została zamknięta.

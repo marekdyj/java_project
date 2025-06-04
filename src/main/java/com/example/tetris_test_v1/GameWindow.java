@@ -291,10 +291,10 @@ public class GameWindow {
         trollPricesBox.setPadding(new Insets(16, 0, 8, 0));
         trollPricesBox.setStyle("-fx-background-color: #eaf1fb; -fx-background-radius: 12;");
         trollPricesBox.getChildren().addAll(
-                createTrollPriceLabel("Freez", trollPrices.get("Freez")),
-                createTrollPriceLabel("Slow", trollPrices.get("Slow")),
-                createTrollPriceLabel("Flashbang", trollPrices.get("Flashbang")),
-                createTrollPriceLabel("Reverse", trollPrices.get("Reverse"))
+                createTrollPriceLabel("[Q] Freez", trollPrices.get("Freez")),
+                createTrollPriceLabel("[W] Slow", trollPrices.get("Slow")),
+                createTrollPriceLabel("[E] Flashbang", trollPrices.get("Flashbang")),
+                createTrollPriceLabel("[R] Reverse", trollPrices.get("Reverse"))
         );
         root.setBottom(trollPricesBox);
 
@@ -463,6 +463,29 @@ public class GameWindow {
     private void setupControls() {
         stage.getScene().setOnKeyPressed(event -> {
             KeyCode key = event.getCode();
+            String troll = null, keyLabel = null;
+            switch (key) {
+                case Q: troll = "Freez";    keyLabel = "[Q]"; break;
+                case W: troll = "Slow";     keyLabel = "[W]"; break;
+                case E: troll = "Flashbang";keyLabel = "[E]"; break;
+                case R: troll = "Reverse";  keyLabel = "[R]"; break;
+                default: break;
+            }
+            if (troll != null) {
+                String target = players.length > 1 && !players[0].equals(nickname) ? players[0] : nickname;
+                for (String p : players) if (!p.equals(nickname)) { target = p; break; }
+                int playerScore = game.getScore();
+                int price = trollPrices.getOrDefault(troll, Integer.MAX_VALUE);
+                if (playerScore >= price) {
+                    sendTroll("TROLL:" + troll + ":" + target);
+                    game.setScore(playerScore - price);
+                    appendMessage("Used " + troll + " on " + target + " via " + keyLabel);
+                } else {
+                    appendMessage("Not enough points for " + troll + " (" + price + ")");
+                }
+                event.consume();
+                return;
+            }
             if (game.getCurrentTetrimino() != null && !game.isClearingInProgress() && game.isGameOver()) {
                 if (!isReverseEffect) {
                     switch (key) {
