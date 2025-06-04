@@ -32,9 +32,7 @@ public abstract class Tetrimino implements Serializable {
     protected abstract Position[] rotateShape();
 
     public void move(int dx, int dy) {
-        // Check if cannot move
         if (checkCollision(dx, dy) || checkOverlap(shape)) return;
-        // Update positions
         for (Position pos : shape) {
             board[pos.x][pos.y] = 0;
             pos.setX(pos.x + dx);

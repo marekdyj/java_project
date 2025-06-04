@@ -160,7 +160,6 @@ public class TetrisLobbyGUI extends Application {
         });
     }
 
-    // Przykładowe klasy pomocnicze (możesz je przenieść do osobnego pliku)
     private LeaderboardEntry[] fetchTop10FromServer() {
         return DataBaseConnector.getTop10().toArray(new LeaderboardEntry[0]);
     }
@@ -312,9 +311,9 @@ public class TetrisLobbyGUI extends Application {
                 appendMessage("Error: " + msg.substring(6));
             } else if (msg.contains("STROLL:")) {
                 String[] parts = msg.split(":");
-                    String trollType = parts[1];
-                    System.out.println(trollType + "aaaaaaa");
-                    gameWindow.triggerEffect(trollType);
+                String trollType = parts[1];
+                System.out.println(trollType + "aaaaaaa");
+                gameWindow.triggerEffect(trollType);
             }
             else {
                 appendMessage("Server: " + msg);

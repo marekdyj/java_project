@@ -69,7 +69,7 @@ public class DataBaseConnector {
     }
     public static int getHighscore(String username) {
         String dbUrl = "jdbc:mysql://localhost:3306/" + dbName + "?serverTimezone=UTC";
-        int highscore = -1; // -1 indicates no score found
+        int highscore = -1;
 
         try (Connection conn = DriverManager.getConnection(dbUrl, user, password);
              Statement stmt = conn.createStatement();

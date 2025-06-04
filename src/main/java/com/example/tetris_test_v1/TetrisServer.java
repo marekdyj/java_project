@@ -9,12 +9,6 @@ import java.sql.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
-/**
- * Podstawowy serwer TCP do gry Tetris.
- * Obsługuje wielu klientów, tworzy pokoje do gry (max 4 graczy),
- * wspiera tryb multiplayer i singleplayer (w przyszłości),
- * gotowy do rozbudowy o funkcje gry, GUI i bazę danych.
- */
 public class TetrisServer {
 
     private static final int PORT = 5000;
@@ -153,7 +147,6 @@ public class TetrisServer {
 
         public void send(Object message) throws IOException {
             synchronized (this) {
-                // Logowanie wiadomości
                 if (message instanceof String) {
                     System.out.println("Sending String to " + nickname + ": " + message);
                 }
@@ -169,6 +162,7 @@ public class TetrisServer {
                     try {
                         player.send("STROLL:" + trollType);
                         System.out.println("Sender: " + this.nickname + "; Sent Troll to: " + player.getNickname());
+                        logger.log("Sender: " + this.nickname + "; Sent Troll to: " + player.getNickname());
                     } catch (IOException e) {
                         System.err.println("Failed to Troll to " + player.getNickname());
                         e.printStackTrace();
@@ -259,6 +253,7 @@ public class TetrisServer {
             broadcast("GAME_STATE:" + initialGameState);
 
             System.out.println("Game started for room with " + players.size() + " players.");
+            logger.log("Game started for room with " + players.size() + " players.");
         }
 
         public void broadcastBoardUpdate(BoardUpdate boardUpdate, ClientHandler sender) {
