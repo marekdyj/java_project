@@ -109,3 +109,40 @@
 [2025-06-04 12:11:58] Received message from a: TROLL:Freez:b
 [2025-06-04 12:12:03] Received message from a: TROLL:Slow:c
 [2025-06-04 12:12:09] Aplikacja została zamknięta.
+[2025-06-04 12:15:20] Aplikacja została uruchomiona.
+[2025-06-04 12:15:22] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:15:27] Aplikacja została zamknięta.
+[2025-06-04 12:16:21] Aplikacja została uruchomiona.
+[2025-06-04 12:16:23] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:16:26] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:16:30] Received message from a: READY
+[2025-06-04 12:16:31] Received message from b: READY
+[2025-06-04 12:16:35] Aplikacja została zamknięta.
+[2025-06-04 12:19:33] Aplikacja została uruchomiona.
+[2025-06-04 12:19:35] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:19:36] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:19:40] Received message from b: READY
+[2025-06-04 12:19:41] Received message from a: READY
+[2025-06-04 12:19:50] Aplikacja została zamknięta.
+[2025-06-04 12:20:05] Aplikacja została uruchomiona.
+[2025-06-04 12:20:07] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:20:08] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:20:09] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:20:16] Received message from c: READY
+[2025-06-04 12:20:16] Received message from b: READY
+[2025-06-04 12:20:17] Received message from a: READY
+[2025-06-04 12:20:22] Aplikacja została zamknięta.
+[2025-06-04 12:21:40] Aplikacja została uruchomiona.
+[2025-06-04 12:21:41] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:21:46] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:21:49] Received message from b: READY
+[2025-06-04 12:21:49] Received message from a: READY
+[2025-06-04 12:21:57] Aplikacja została zamknięta.
+[2025-06-04 12:22:30] Aplikacja została uruchomiona.
+[2025-06-04 12:22:31] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:22:33] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:22:34] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:22:41] Received message from c: READY
+[2025-06-04 12:22:41] Received message from b: READY
+[2025-06-04 12:22:42] Received message from a: READY
+[2025-06-04 12:22:50] Aplikacja została zamknięta.

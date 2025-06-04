@@ -160,6 +160,28 @@ public class GameWindow {
             } else {
                 canvas = new Canvas(BOARD_WIDTH * BLOCK_SIZE * enemyScale, BOARD_HEIGHT * BLOCK_SIZE * enemyScale);
                 canvas.setEffect(new DropShadow(6, Color.web("#b0becb", 0.10)));
+                canvas.setOnMouseClicked(e -> {
+                    if (trollTargetComboBox != null) {
+                        Platform.runLater(() -> {
+                            trollTargetComboBox.setValue(player);
+                            for (String p : players) {
+                                if (!p.equals(nickname)) {
+                                    Canvas c = playerCanvases.get(p);
+                                    if (c != null) {
+                                        VBox board = (VBox) c.getParent();
+                                        if (p.equals(player)) {
+                                            board.setBackground(new Background(new BackgroundFill(Color.web("#ffe5e5"), new CornerRadii(12), Insets.EMPTY)));
+                                            board.setBorder(new Border(new BorderStroke(Color.web("#e57373"), BorderStrokeStyle.SOLID, new CornerRadii(12), new BorderWidths(2.5))));
+                                        } else {
+                                            board.setBackground(new Background(new BackgroundFill(Color.web("#f8fafc"), new CornerRadii(12), Insets.EMPTY)));
+                                            board.setBorder(new Border(new BorderStroke(Color.web("#c5ccd7"), BorderStrokeStyle.SOLID, new CornerRadii(12), new BorderWidths(1.2))));
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
             }
             playerCanvases.put(player, canvas);
 
