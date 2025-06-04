@@ -193,11 +193,21 @@ public class GameWindow {
             infoBox.setPadding(new Insets(11, 10, 11, 5));
             infoBox.setMinWidth(isLocal ? 140 : 90);
 
-            // Score i Level
-            Label scoreLabel = new Label("Score: 0");
+            Label scoreTitle = new Label("SCORE");
+            scoreTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, isLocal ? 18 : 14));
+            scoreTitle.setTextFill(Color.web("#1c4a76"));
+            scoreTitle.setAlignment(Pos.CENTER);
+            if (!isLocal) {
+                scoreTitle.setScaleX(enemyLabelScale);
+                scoreTitle.setScaleY(enemyLabelScale);
+            }
+
+            Label scoreLabel = new Label("0");
             scoreLabel.setFont(Font.font("Consolas", FontWeight.BOLD, isLocal ? 16 : 12));
             scoreLabel.setTextFill(Color.web("#2d517c"));
             scoreLabel.setStyle("-fx-background-color: #eaf1fb; -fx-padding: 6 32 6 32; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #b3c8e6; -fx-border-width: 1.1;");
+            scoreLabel.setAlignment(Pos.CENTER);
+            scoreLabel.setMaxWidth(Double.MAX_VALUE);
             scoreLabel.setMinWidth(isLocal ? 120 : 70);
             if (!isLocal) {
                 scoreLabel.setScaleX(enemyLabelScale);
@@ -205,10 +215,17 @@ public class GameWindow {
             }
             playerScoreLabels.put(player, scoreLabel);
 
+            Label levelTitle = new Label("LEVEL");
+            levelTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, isLocal ? 18 : 14));
+            levelTitle.setTextFill(Color.web("#1c4a76"));
+            levelTitle.setAlignment(Pos.CENTER);
+
             Label levelLabel = new Label("Level: 1");
             levelLabel.setFont(Font.font("Consolas", FontWeight.SEMI_BOLD, isLocal ? 15 : 11));
             levelLabel.setTextFill(Color.web("#5271a6"));
             levelLabel.setStyle("-fx-background-color: #f2f5fa; -fx-padding: 4 32 4 32; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #d5e4f2; -fx-border-width: 1.0;");
+            levelLabel.setAlignment(Pos.CENTER);
+            levelLabel.setMaxWidth(Double.MAX_VALUE);
             levelLabel.setMinWidth(isLocal ? 120 : 70);
             if (!isLocal) {
                 levelLabel.setScaleX(enemyLabelScale);
@@ -286,7 +303,7 @@ public class GameWindow {
                 root.requestFocus();
             });
 
-                infoBox.getChildren().addAll(nextLabel, nextCanvas, scoreLabel, levelLabel, trollTypeComboBox, trollTargetComboBox, buyButton);
+                infoBox.getChildren().addAll(nextLabel, nextCanvas,scoreTitle, scoreLabel,levelTitle, levelLabel, trollTypeComboBox, trollTargetComboBox, buyButton);
 
                 // Odstęp między planszą a cenami (dol)
                 VBox gapBox = new VBox();
@@ -429,18 +446,31 @@ public class GameWindow {
         }).start();
     }
 
+    private String formatScore(int score) {
+        if (score < 10_000) {
+            return String.valueOf(score);
+        } else if (score < 100_000) {
+            double k = score / 1000.0;
+            return String.format("%.1fK", k).replace(".0K", "K");
+        } else {
+            int k = score / 1000;
+            return k + "K";
+        }
+    }
 
     private void updateScoreLabel(String player, int score) {
         Label scoreLabel = playerScoreLabels.get(player);
         if (scoreLabel != null) {
-            Platform.runLater(() -> scoreLabel.setText("Score: " + score));
+            Platform.runLater(() -> scoreLabel.setText(formatScore(score)));
         }
     }
 
     private void updateLevelLabel(String player, int level) {
+        String levelS;
         Label levelLabel = playerLevelLabels.get(player);
         if (levelLabel != null) {
-            Platform.runLater(() -> levelLabel.setText("Level: " + level));
+            levelS = String.valueOf(level);
+            Platform.runLater(() -> levelLabel.setText(levelS));
         }
     }
 
@@ -798,6 +828,7 @@ public class GameWindow {
     }
 
 
+
     private void showGameOverScreen(int score, int level) {
         Platform.runLater(() -> {
             Stage gameOverStage = new Stage();
@@ -811,7 +842,10 @@ public class GameWindow {
             gameOverLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 28));
             gameOverLabel.setTextFill(Color.web("#1c4a76"));
 
-            Label scoreLabel = new Label("Twój wynik: " + score);
+
+            String formattedScore = formatScore(score);
+
+            Label scoreLabel = new Label("Twój wynik: " + formattedScore);
             scoreLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 18));
             scoreLabel.setTextFill(Color.web("#355c9b"));
 
