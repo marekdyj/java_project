@@ -2,10 +2,9 @@ package com.example.tetris_test_v1;
 
 //klasa tworząca określoną bazę danych mysql
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataBaseConnector {
         private static final String serverUrl = "jdbc:mysql://localhost:3306/?serverTimezone=UTC";
@@ -48,6 +47,9 @@ public class DataBaseConnector {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        // Wypełnienie przykładowymi danymi
+        fillWithSampleData();
     }
 
     public static void updateHighscore(String username, int score) {
@@ -82,5 +84,60 @@ public class DataBaseConnector {
         }
 
         return highscore;
+    }
+
+    public static List<LeaderboardEntry> getTop10() {
+        String dbUrl = "jdbc:mysql://localhost:3306/" + dbName + "?serverTimezone=UTC";
+        List<LeaderboardEntry> top10 = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(dbUrl, user, password);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT username, highscore FROM users ORDER BY highscore DESC LIMIT 10")) {
+            int place = 1;
+            while (rs.next()) {
+                top10.add(new LeaderboardEntry(rs.getString("username"), rs.getInt("highscore"), place++));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return top10;
+    }
+
+    public static LeaderboardEntry getUserRanking(String username) {
+        String dbUrl = "jdbc:mysql://localhost:3306/" + dbName + "?serverTimezone=UTC";
+        int userScore = getHighscore(username);
+        int place = 1;
+        try (Connection conn = DriverManager.getConnection(dbUrl, user, password);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) AS rank FROM users WHERE highscore > " + userScore)) {
+            if (rs.next()) {
+                place += rs.getInt("rank");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new LeaderboardEntry(username, userScore, place);
+    }
+
+    public static void fillWithSampleData() {
+        String dbUrl = "jdbc:mysql://localhost:3306/" + dbName + "?serverTimezone=UTC";
+        String[] usernames = {
+                "Anna", "Bartek", "Cezary", "Dorota", "Ewa", "Filip", "Grzegorz", "Hania", "Iga", "Jan",
+                "Kamil", "Lena", "Marek", "Natalia", "Oskar", "Patryk", "Rafał", "Sandra", "Tomasz", "Ula"
+        };
+        int[] scores = {
+                12000, 11500, 11000, 10800, 10500, 10200, 10000, 9800, 9500, 9400,
+                9000, 8800, 8600, 8500, 8300, 8200, 8000, 7800, 7600, 7500
+        };
+
+        try (Connection conn = DriverManager.getConnection(dbUrl, user, password);
+             Statement stmt = conn.createStatement()) {
+            for (int i = 0; i < usernames.length; i++) {
+                stmt.executeUpdate("INSERT INTO users (username, highscore) VALUES ('" + usernames[i] + "', " + scores[i] + ") " +
+                        "ON DUPLICATE KEY UPDATE highscore = GREATEST(highscore, " + scores[i] + "), highscore_date = CURRENT_TIMESTAMP");
+            }
+            System.out.println("Baza została uzupełniona przykładowymi wynikami.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

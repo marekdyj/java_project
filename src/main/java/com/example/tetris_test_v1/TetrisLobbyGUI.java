@@ -3,6 +3,7 @@ package com.example.tetris_test_v1;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -91,25 +92,40 @@ public class TetrisLobbyGUI extends Application {
     }
 
     private void showMainMenu() {
-        VBox root = new VBox(12);
+        VBox root = new VBox(14);
         root.setPadding(new Insets(22, 22, 22, 22));
         root.setSpacing(10);
-        // Light background and subtle border
         root.setBackground(new Background(new BackgroundFill(Color.web("#f4f6fa"), new CornerRadii(8), Insets.EMPTY)));
         root.setBorder(new Border(new BorderStroke(Color.web("#c5ccd7"), BorderStrokeStyle.SOLID, new CornerRadii(8), new BorderWidths(2))));
 
-        Label titleLabel = new Label("Welcome to Tetris Lobby");
-        titleLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
-        titleLabel.setTextFill(Color.web("#33415c"));
+        Label leaderboardLabel = new Label("🏆 Top 10 Leaderboard");
+        leaderboardLabel.setFont(Font.font("System", FontWeight.BOLD, 15));
+        leaderboardLabel.setTextFill(Color.web("#33415c"));
 
-        serverMessages = new TextArea();
-        serverMessages.setEditable(false);
-        serverMessages.setPrefHeight(120);
-        serverMessages.setStyle("-fx-control-inner-background: #e7ecf3; -fx-text-fill: #33415c; -fx-font-size: 12px;");
+        VBox leaderboardBox = new VBox(3);
+        leaderboardBox.setPadding(new Insets(6, 10, 6, 10));
+        leaderboardBox.setBackground(new Background(new BackgroundFill(Color.web("#e7ecf3"), new CornerRadii(6), Insets.EMPTY)));
+        leaderboardBox.setBorder(new Border(new BorderStroke(Color.web("#d5dde7"), BorderStrokeStyle.SOLID, new CornerRadii(6), new BorderWidths(1))));
 
+        // Pobierz top 10 i wynik gracza (przykład - pobieranie z serwera)
+        LeaderboardEntry[] top10 = fetchTop10FromServer();
+        LeaderboardEntry myScore = fetchMyScoreFromServer(nickname);
+
+        for (int i = 0; i < top10.length; i++) {
+            LeaderboardEntry entry = top10[i];
+            Label entryLabel = new Label((i + 1) + ". " + entry.username() + " - " + entry.score());
+            entryLabel.setFont(Font.font("System", FontWeight.NORMAL, 13));
+            leaderboardBox.getChildren().add(entryLabel);
+        }
+
+        // Oddzielny box na wynik gracza
+        Label myScoreLabel = new Label("Twój wynik: " + myScore.score() + " (miejsce: " + myScore.place() + ")");
+        myScoreLabel.setFont(Font.font("System", FontWeight.BOLD, 13));
+        myScoreLabel.setTextFill(Color.web("#246b5d"));
+
+        // Przycisk single/multi
         Button singleplayerBtn = new Button("Singleplayer");
         Button multiplayerBtn = new Button("Multiplayer");
-
         singleplayerBtn.setFont(Font.font("System", FontWeight.BOLD, 12));
         singleplayerBtn.setBackground(new Background(new BackgroundFill(Color.web("#e3e9f6"), new CornerRadii(6), Insets.EMPTY)));
         singleplayerBtn.setTextFill(Color.web("#33415c"));
@@ -118,11 +134,11 @@ public class TetrisLobbyGUI extends Application {
         multiplayerBtn.setTextFill(Color.web("#246b5d"));
 
         HBox buttonBox = new HBox(14, singleplayerBtn, multiplayerBtn);
-        buttonBox.setPadding(new Insets(10, 0, 0, 0));
+        buttonBox.setAlignment(Pos.CENTER);
 
-        root.getChildren().addAll(titleLabel, serverMessages, buttonBox);
+        root.getChildren().addAll(leaderboardLabel, leaderboardBox, myScoreLabel, buttonBox);
 
-        Scene scene = new Scene(root, 400, 230);
+        Scene scene = new Scene(root, 400, 370);
         primaryStage.setScene(scene);
 
         singleplayerBtn.setOnAction(e -> sendChoice("1"));
@@ -130,6 +146,15 @@ public class TetrisLobbyGUI extends Application {
             sendChoice("2");
             Platform.runLater(this::showMultiplayerLobby);
         });
+    }
+
+    // Przykładowe klasy pomocnicze (możesz je przenieść do osobnego pliku)
+    private LeaderboardEntry[] fetchTop10FromServer() {
+        return DataBaseConnector.getTop10().toArray(new LeaderboardEntry[0]);
+    }
+
+    private LeaderboardEntry fetchMyScoreFromServer(String username) {
+        return DataBaseConnector.getUserRanking(username);
     }
 
     private void connectToServer() {
