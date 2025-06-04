@@ -84,3 +84,28 @@
 [2025-06-04 11:58:03] Nowy klient połączony: /127.0.0.1
 [2025-06-04 11:58:05] Received message from a: READY
 [2025-06-04 11:58:11] Aplikacja została zamknięta.
+[2025-06-04 12:03:05] Aplikacja została uruchomiona.
+[2025-06-04 12:03:06] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:03:07] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:03:09] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:03:19] Received message from b: READY
+[2025-06-04 12:03:20] Received message from c: READY
+[2025-06-04 12:03:20] Received message from a: READY
+[2025-06-04 12:03:27] Received message from a: TROLL:Freez:c
+[2025-06-04 12:03:45] Aplikacja została zamknięta.
+[2025-06-04 12:11:14] Aplikacja została uruchomiona.
+[2025-06-04 12:11:16] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:11:17] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:11:21] Received message from b: READY
+[2025-06-04 12:11:22] Received message from a: READY
+[2025-06-04 12:11:30] Aplikacja została zamknięta.
+[2025-06-04 12:11:39] Aplikacja została uruchomiona.
+[2025-06-04 12:11:40] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:11:41] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:11:42] Nowy klient połączony: /127.0.0.1
+[2025-06-04 12:11:49] Received message from c: READY
+[2025-06-04 12:11:50] Received message from b: READY
+[2025-06-04 12:11:51] Received message from a: READY
+[2025-06-04 12:11:58] Received message from a: TROLL:Freez:b
+[2025-06-04 12:12:03] Received message from a: TROLL:Slow:c
+[2025-06-04 12:12:09] Aplikacja została zamknięta.

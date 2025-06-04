@@ -58,6 +58,8 @@ public class GameWindow {
     private Map<String, Canvas> playerNextCanvases = new ConcurrentHashMap<>();
     private Map<String, Label> playerScoreLabels = new ConcurrentHashMap<>();
     private Map<String, Label> playerLevelLabels = new ConcurrentHashMap<>();
+    ComboBox<String> trollTargetComboBox;
+    ComboBox<String> trollTypeComboBox;
     private String nickname;
     private String[] players;
     private final Map<String, Integer> trollPrices = Map.of(
@@ -203,7 +205,7 @@ public class GameWindow {
                 nextCanvas.setEffect(new DropShadow(6, Color.web("#b3c8e6", 0.13)));
                 playerNextCanvases.put(player, nextCanvas);
 
-                ComboBox<String> trollTypeComboBox = new ComboBox<>();
+                trollTypeComboBox = new ComboBox<>();
                 trollTypeComboBox.getItems().addAll("Freez", "Slow", "Flashbang", "Reverse");
                 trollTypeComboBox.setPromptText("Wybierz czar");
                 trollTypeComboBox.setStyle("-fx-background-color: #eaf1fb; -fx-padding: 6 12 6 12; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #b3c8e6; -fx-border-width: 1.1;");
@@ -211,7 +213,7 @@ public class GameWindow {
                 trollTypeComboBox.setPrefWidth(160);
                 trollTypeComboBox.setOnAction(e -> root.requestFocus());
 
-                ComboBox<String> trollTargetComboBox = new ComboBox<>();
+                trollTargetComboBox = new ComboBox<>();
                 trollTargetComboBox.getItems().addAll(players);
                 trollTargetComboBox.setPromptText("Wybierz cel trola");
                 trollTargetComboBox.setStyle("-fx-background-color: #f9f9ff; -fx-padding: 6 12 6 12; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #c5d3ea; -fx-border-width: 1.1;");
@@ -472,8 +474,27 @@ public class GameWindow {
                 default: break;
             }
             if (troll != null) {
-                String target = players.length > 1 && !players[0].equals(nickname) ? players[0] : nickname;
-                for (String p : players) if (!p.equals(nickname)) { target = p; break; }
+                if (trollTypeComboBox != null &&
+                        trollTypeComboBox.getValue() != null &&
+                        !trollTypeComboBox.getValue().isEmpty() &&
+                        !trollTypeComboBox.getValue().equals(trollTypeComboBox.getPromptText())) {
+                    troll = trollTypeComboBox.getValue();
+                }
+                String target = null;
+                if (trollTargetComboBox != null &&
+                        trollTargetComboBox.getValue() != null &&
+                        !trollTargetComboBox.getValue().isEmpty() &&
+                        !trollTargetComboBox.getValue().equals(trollTargetComboBox.getPromptText())) {
+                    target = trollTargetComboBox.getValue();
+                } else {
+                    target = nickname;
+                    for (String p : players) {
+                        if (!p.equals(nickname)) {
+                            target = p;
+                            break;
+                        }
+                    }
+                }
                 int playerScore = game.getScore();
                 int price = trollPrices.getOrDefault(troll, Integer.MAX_VALUE);
                 if (playerScore >= price) {
