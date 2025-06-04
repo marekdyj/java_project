@@ -91,7 +91,15 @@ public class TetrisLobbyGUI extends Application {
         }
     }
 
-    private void showMainMenu() {
+    public void showMainMenu() {
+        showMainMenu(primaryStage);
+    }
+
+    public void showMainMenu(Stage stage) {
+        this.primaryStage = stage;
+        if (out == null || socket == null || socket.isClosed()) {
+            connectToServer();
+        }
         VBox root = new VBox(14);
         root.setPadding(new Insets(22, 22, 22, 22));
         root.setSpacing(10);
@@ -123,6 +131,11 @@ public class TetrisLobbyGUI extends Application {
         myScoreLabel.setFont(Font.font("System", FontWeight.BOLD, 13));
         myScoreLabel.setTextFill(Color.web("#246b5d"));
 
+        Scene scene = new Scene(root, 400, 370);
+        stage.setScene(scene);
+        stage.setTitle("Tetris - Menu");
+        stage.show();
+
         // Przycisk single/multi
         Button singleplayerBtn = new Button("Singleplayer");
         Button multiplayerBtn = new Button("Multiplayer");
@@ -138,8 +151,7 @@ public class TetrisLobbyGUI extends Application {
 
         root.getChildren().addAll(leaderboardLabel, leaderboardBox, myScoreLabel, buttonBox);
 
-        Scene scene = new Scene(root, 400, 370);
-        primaryStage.setScene(scene);
+
 
         singleplayerBtn.setOnAction(e -> sendChoice("1"));
         multiplayerBtn.setOnAction(e -> {
@@ -237,8 +249,6 @@ public class TetrisLobbyGUI extends Application {
                 readyButton.setText("Ready!");
                 readyButton.setBackground(new Background(new BackgroundFill(Color.web("#b4e2af"), new CornerRadii(5), Insets.EMPTY)));
                 readyButton.setTextFill(Color.web("#246b5d"));
-                readyStatusLabel.setText("Ready: " + (readyPlayers + 1) + "/" + totalPlayers);
-                readyPlayers++;
                 out.writeObject("READY");
                 out.flush();
             } catch (IOException ex) {

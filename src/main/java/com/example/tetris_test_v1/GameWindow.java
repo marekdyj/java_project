@@ -46,7 +46,7 @@ public class GameWindow {
     private volatile boolean isReverseEffect = false;
     private volatile boolean isFreezEffect = false;
     private volatile boolean isFlashEffect = false;
-
+    private boolean gameOverDialogShown = false;
 
 
     private final Stage stage;
@@ -559,7 +559,6 @@ public class GameWindow {
 
             if (!game.isGameOver()) {
                 gc = gameCanvas.getGraphicsContext2D();
-
                 gc.setFill(Color.rgb(255, 0, 0, 0.5));
                 gc.fillRect(0, 0, gameCanvas.getWidth(), gameCanvas.getHeight());
                 gc.setFill(Color.rgb(255, 255, 255, 0.8));
@@ -568,6 +567,10 @@ public class GameWindow {
                 gc.setTextBaseline(VPos.CENTER);
                 gc.fillText("GAME OVER", gameCanvas.getWidth() / 2, gameCanvas.getHeight() / 2);
 
+                if (!gameOverDialogShown) {
+                    showGameOverScreen(game.getScore(), game.getLevel());
+                    gameOverDialogShown = true;
+                }
             }
 
 
@@ -726,5 +729,61 @@ public class GameWindow {
             serverMessages.setEditable(false);
         }
         Platform.runLater(() -> serverMessages.appendText(msg + "\n"));
+    }
+
+
+    private void showGameOverScreen(int score, int level) {
+        Platform.runLater(() -> {
+            Stage gameOverStage = new Stage();
+            VBox root = new VBox(18);
+            root.setAlignment(Pos.CENTER);
+            root.setPadding(new Insets(40, 30, 40, 30));
+            root.setBackground(new Background(new BackgroundFill(Color.web("#f6f8fb"), new CornerRadii(16), Insets.EMPTY)));
+            root.setBorder(new Border(new BorderStroke(Color.web("#c5ccd7"), BorderStrokeStyle.SOLID, new CornerRadii(16), new BorderWidths(2))));
+
+            Label gameOverLabel = new Label("Koniec gry!");
+            gameOverLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 28));
+            gameOverLabel.setTextFill(Color.web("#1c4a76"));
+
+            Label scoreLabel = new Label("Twój wynik: " + score);
+            scoreLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 18));
+            scoreLabel.setTextFill(Color.web("#355c9b"));
+
+            Label levelLabel = new Label("Osiągnięty poziom: " + level);
+            levelLabel.setFont(Font.font("Segoe UI", FontWeight.NORMAL, 16));
+            levelLabel.setTextFill(Color.web("#5271a6"));
+
+            HBox buttonBox = new HBox(18);
+            buttonBox.setAlignment(Pos.CENTER);
+
+            Button exitBtn = new Button("Wyjdź");
+            exitBtn.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
+            exitBtn.setStyle("-fx-background-color: #f8d7da; -fx-background-radius: 8;");
+            exitBtn.setOnAction(e -> Platform.exit());
+
+            Button menuBtn = new Button("Powrót do menu");
+            menuBtn.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
+            menuBtn.setStyle("-fx-background-color: #eaf1fb; -fx-background-radius: 8;");
+            menuBtn.setOnAction(e -> {
+                gameOverStage.close();
+                // Ustaw menu na głównym oknie gry
+                Platform.runLater(() -> {
+                    try {
+                        new TetrisLobbyGUI().start(stage);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                });
+            });
+
+            buttonBox.getChildren().addAll(menuBtn, exitBtn);
+            root.getChildren().addAll(gameOverLabel, scoreLabel, levelLabel, buttonBox);
+
+            Scene scene = new Scene(root, 350, 260);
+            gameOverStage.setScene(scene);
+            gameOverStage.setTitle("Koniec gry");
+            gameOverStage.setResizable(false);
+            gameOverStage.show();
+        });
     }
 }
